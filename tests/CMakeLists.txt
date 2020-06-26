@@ -1,0 +1,5 @@
+include_directories(${PROJECT_SOURCE_DIR}/include/ $ENV{VK_SDK_PATH}/Include/ $ENV{GLM_PATH})
+link_directories(${PROJECT_SOURCE_DIR}/library/ $ENV{VK_SDK_PATH}/Lib/)
+add_executable(hearthfire entry.cpp)
+target_link_libraries(hearthfire PUBLIC ${HAPI_LIBRARY_NAME})
+set_target_properties(hearthfire PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/tests/bin/)
