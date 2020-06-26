@@ -261,6 +261,9 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     //! \brief The logical device that will create this descriptor set.
     VkDevice mLogicalDevice;
 
+    //! \brief The descriptor pool this object was created from.
+    VkDescriptorPool mDescriptorPool;
+
     //! \brief The handle to this descriptor set, given to us by vulkan.
     VkDescriptorSet mDescriptorSet;
   };

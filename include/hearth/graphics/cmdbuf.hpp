@@ -216,6 +216,9 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     //! \brief The logical device that this command buffer was created from.
     VkDevice mLogicalDevice;
 
+    //! \brief The command pool this buffer was created from.
+    VkCommandPool mCommandPool;
+
     //! \brief The command buffer this object represents.
     VkCommandBuffer mCommandBuffer;
 

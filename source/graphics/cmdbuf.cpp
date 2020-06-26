@@ -75,6 +75,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
 
   CommandBuffer::CommandBuffer() noexcept
     : mLogicalDevice(nullptr)
+    , mCommandPool(nullptr)
     , mCommandBuffer(nullptr)
     , mRecordingFence(nullptr)
   {
@@ -82,6 +83,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
 
   CommandBuffer::CommandBuffer(const CreateInfo& createInfo)
     : mLogicalDevice(createInfo.logicalDevice)
+    , mCommandPool(nullptr)
     , mCommandBuffer(nullptr)
     , mRecordingFence(nullptr)
   {
@@ -89,12 +91,15 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     if (createInfo.commandPool == nullptr)
       throw std::runtime_error("Cannot create command buffer from null command pool.");
 
+    // Set command pool.
+    mCommandPool = createInfo.commandPool->handle();
+
     // Provide allocation information.
     VkCommandBufferAllocateInfo allocInfo;
     {
       allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
       allocInfo.pNext              = nullptr;
-      allocInfo.commandPool        = createInfo.commandPool->handle();
+      allocInfo.commandPool        = mCommandPool;
       allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
       allocInfo.commandBufferCount = 1;
     }
@@ -126,20 +131,24 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     // Wait for device then destroy fence.
     vkDeviceWaitIdle(mLogicalDevice);
     vkDestroyFence(mLogicalDevice, mRecordingFence, nullptr);
+    vkFreeCommandBuffers(mLogicalDevice, mCommandPool, 1, &mCommandBuffer);
   }
 
   CommandBuffer::CommandBuffer(CommandBuffer&& other) noexcept
     : mLogicalDevice(std::move(other.mLogicalDevice))
+    , mCommandPool(std::move(other.mCommandPool))
     , mCommandBuffer(std::move(other.mCommandBuffer))
     , mRecordingFence(std::move(other.mRecordingFence))
   {
     other.mLogicalDevice  = nullptr;
+    other.mCommandPool    = nullptr;
     other.mCommandBuffer  = nullptr;
     other.mRecordingFence = nullptr;
   }
 
   CommandBuffer& CommandBuffer::operator=(CommandBuffer&& other) noexcept {
     std::swap(mLogicalDevice,  other.mLogicalDevice);
+    std::swap(mCommandPool,    other.mCommandPool);
     std::swap(mCommandBuffer,  other.mCommandBuffer);
     std::swap(mRecordingFence, other.mRecordingFence);
     return *this;

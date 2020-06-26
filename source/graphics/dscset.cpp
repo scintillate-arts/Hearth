@@ -161,11 +161,13 @@ namespace HAPI_NAMESPACE_NAME::gfx {
 
   DescriptorSet::DescriptorSet() noexcept
     : mLogicalDevice(nullptr)
+    , mDescriptorPool(nullptr)
     , mDescriptorSet(nullptr)
   { }
 
   DescriptorSet::DescriptorSet(const CreateInfo& createInfo)
     : mLogicalDevice(createInfo.logicalDevice)
+    , mDescriptorPool(nullptr)
     , mDescriptorSet(nullptr)
   {
     // Expects.
@@ -176,6 +178,9 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     if (createInfo.descriptorLayout == nullptr)
       throw std::runtime_error("Cannot create descriptor set from null descriptor set layout.");
 
+    // Set descriptor pool.
+    mDescriptorPool = createInfo.descriptorPool->handle();
+
     // Prefetch descriptor layout because compiler complains about &(createInfo.descriptorLayout->handle());
     const auto layout = createInfo.descriptorLayout->handle();
 
@@ -184,7 +189,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     {
       allocInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
       allocInfo.pNext              = nullptr;
-      allocInfo.descriptorPool     = createInfo.descriptorPool->handle();
+      allocInfo.descriptorPool     = mDescriptorPool;
       allocInfo.descriptorSetCount = 1;
       allocInfo.pSetLayouts        = &layout;
     }
@@ -201,6 +206,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
 
   DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept
     : mLogicalDevice(std::move(other.mLogicalDevice))
+    , mDescriptorPool(std::move(other.mDescriptorPool))
     , mDescriptorSet(std::move(other.mDescriptorSet))
   {
     // Ensures.
@@ -209,8 +215,9 @@ namespace HAPI_NAMESPACE_NAME::gfx {
   }
 
   DescriptorSet& DescriptorSet::operator=(DescriptorSet&& other) noexcept {
-    std::swap(mLogicalDevice, other.mLogicalDevice);
-    std::swap(mDescriptorSet, other.mDescriptorSet);
+    std::swap(mLogicalDevice,  other.mLogicalDevice);
+    std::swap(mDescriptorPool, other.mDescriptorPool);
+    std::swap(mDescriptorSet,  other.mDescriptorSet);
     return *this;
   }
 
