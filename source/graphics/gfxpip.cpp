@@ -19,6 +19,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+#include <array>
 #include <fstream>
 #include <stdexcept>
 #include <hearth/graphics/gfxpip.hpp>
@@ -237,47 +238,15 @@ namespace HAPI_NAMESPACE_NAME::gfx {
       inputAssembly.primitiveRestartEnable = VK_FALSE;
     }
 
-    std::vector<VkViewport> viewports;
-    for (auto& viewport : createInfo.viewports) {
-      VkViewport vp;
-      {
-        vp.x        = viewport->origin.x;
-        vp.y        = viewport->origin.y;
-        vp.width    = static_cast<float>(viewport->extent.x);
-        vp.height   = static_cast<float>(viewport->extent.y);
-        vp.minDepth = viewport->minDepth;
-        vp.maxDepth = viewport->maxDepth;
-      }
-
-      viewports.push_back(vp);
-    }
-
-    if (viewports.empty())
-      throw std::runtime_error("Must provide at least one viewport.");
-
-    std::vector<VkRect2D> scissors;
-    for (auto& scissor : createInfo.scissors) {
-      VkRect2D sc;
-      {
-        sc.offset = { scissor->offset.x, scissor->offset.y };
-        sc.extent = { scissor->extent.x, scissor->extent.y };
-      }
-
-      scissors.push_back(sc);
-    }
-
-    if (scissors.empty())
-      throw std::runtime_error("Must provide at least one scissor.");
-
     VkPipelineViewportStateCreateInfo viewportState;
     {
       viewportState.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
       viewportState.pNext         = nullptr;
       viewportState.flags         = 0;
-      viewportState.viewportCount = static_cast<std::uint32_t>(viewports.size());
-      viewportState.pViewports    = viewports.data();
-      viewportState.scissorCount  = static_cast<std::uint32_t>(scissors.size());
-      viewportState.pScissors     = scissors.data();
+      viewportState.viewportCount = 1;
+      viewportState.pViewports    = nullptr;
+      viewportState.scissorCount  = 1;
+      viewportState.pScissors     = nullptr;
     }
 
     VkPipelineRasterizationStateCreateInfo rasterizer;
@@ -344,6 +313,19 @@ namespace HAPI_NAMESPACE_NAME::gfx {
       colorBlend.blendConstants[3] = createInfo.colorBlending->blendConstants[3];
     }
 
+    std::array<VkDynamicState, 2> dynamicStates {
+      VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
+    };
+
+    VkPipelineDynamicStateCreateInfo pdsCreateInfo;
+    {
+      pdsCreateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+      pdsCreateInfo.pNext             = nullptr;
+      pdsCreateInfo.flags             = 0;
+      pdsCreateInfo.dynamicStateCount = static_cast<std::uint32_t>(dynamicStates.size());
+      pdsCreateInfo.pDynamicStates    = dynamicStates.data();
+    }
+
     // Expects.
     if (createInfo.layout == nullptr)
       throw std::runtime_error("Cannot create graphics pipeline with null layout.");
@@ -363,7 +345,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
       pipelineCreateInfo.pMultisampleState    = &multisampling;
       pipelineCreateInfo.pDepthStencilState   = nullptr;
       pipelineCreateInfo.pColorBlendState     = &colorBlend;
-      pipelineCreateInfo.pDynamicState        = nullptr;
+      pipelineCreateInfo.pDynamicState        = &pdsCreateInfo;
       pipelineCreateInfo.layout               = createInfo.layout->handle();
       pipelineCreateInfo.renderPass           = createInfo.renderPass;
       pipelineCreateInfo.subpass              = createInfo.subpass;

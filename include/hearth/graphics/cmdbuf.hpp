@@ -162,6 +162,18 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     void updateBuffer(const ResourceBuffer* buffer, std::size_t offset, const void* data, std::size_t dataSize);
 
     /*!
+     * \brief     Updates the viewport of a bound graphics pipeline.
+     * \param[in] viewport The new viewport.
+     */
+    void updateViewport(const Viewport& viewport);
+
+    /*!
+     * \brief     Updates the scissor of a bound graphics pipeline.
+     * \param[in] scissor The new scissor.
+     */
+    void updateScissor(const Scissor& scissor);
+
+    /*!
      * \brief     Binds the given vertex buffer.
      * \param[in] vertexBuffer The vertex buffer to bind.
      */

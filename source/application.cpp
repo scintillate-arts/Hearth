@@ -392,27 +392,10 @@ namespace HAPI_NAMESPACE_NAME {
       .logicOpEnabled = false
     };
 
-    // Provide viewport.
-    const auto imageResolution = mSwapChain->imageResolution();
-    const gfx::Viewport viewport {
-      .origin   = glm::ivec2{ 0,                  imageResolution.y }, // Flip Vulkan Viewport
-      .extent   = glm::ivec2{ imageResolution.x, -imageResolution.y }, // Flip Vulkan Viewport
-      .minDepth = 0.0f,
-      .maxDepth = 1.0f
-    };
-
-    // Provide scissor.
-    const gfx::Scissor scissor {
-      .offset = glm::ivec2{ 0, 0 },
-      .extent = imageResolution
-    };
-
     // Provide graphics pipeline create info.
     const gfx::Pipeline::CreateInfo gfxpipCreateInfo {
       .vertexBindings   = std::vector{ &bindingDesc },
       .vertexAttributes = std::vector{ &posAttrDesc, &colorAttrDesc },
-      .viewports        = std::vector{ &viewport },
-      .scissors         = std::vector{ &scissor },
       .colorBlending    = &colorBlendState,
       .layout           = mPipelineLayout.get(),
       .base             = nullptr,
@@ -520,10 +503,29 @@ namespace HAPI_NAMESPACE_NAME {
       .renderAreaExtent = mSwapChain->imageResolution()
     };
 
+    // Get swapchain size.
+    const auto resolution = mSwapChain->imageResolution();
+
+    // Provide viewport.
+    const gfx::Viewport viewport {
+      .origin   = glm::ivec2{ 0,             resolution.y },
+      .extent   = glm::ivec2{ resolution.x, -resolution.y },
+      .minDepth = 0.0f,
+      .maxDepth = 1.0f,
+    };
+
+    // Provide scissor.
+    const gfx::Scissor scissor {
+      .offset = glm::ivec2{ 0, 0 },
+      .extent = resolution
+    };
+
     mCommandBuffer->begin();
     mCommandBuffer->updateBuffer(mUniformBuffer.get(), 0, &ubo, sizeof(UniformBufferObject));
     mCommandBuffer->beginRenderPass(brpi);
     mCommandBuffer->bindPipeline(mGraphicsPipeline.get(), gfx::PipelineBindPoint::Graphics);
+    mCommandBuffer->updateViewport(viewport);
+    mCommandBuffer->updateScissor(scissor);
     mCommandBuffer->bindVertexBuffer(mVertexBuffer.get());
     mCommandBuffer->bindIndexBuffer(mIndexBuffer.get());
     mCommandBuffer->bindDescriptorSet(mUniformDescriptorSet.get(), mPipelineLayout.get());

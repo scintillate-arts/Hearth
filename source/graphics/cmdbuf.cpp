@@ -208,6 +208,34 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     vkCmdUpdateBuffer(mCommandBuffer, buffer->handle(), offset, dataSize, data);
   }
 
+  void CommandBuffer::updateViewport(const Viewport& viewport) {
+    // Provide new viewport.
+    VkViewport newViewport;
+    {
+      newViewport.x        = viewport.origin.x;
+      newViewport.y        = viewport.origin.y;
+      newViewport.width    = static_cast<float>(viewport.extent.x);
+      newViewport.height   = static_cast<float>(viewport.extent.y);
+      newViewport.minDepth = viewport.minDepth;
+      newViewport.maxDepth = viewport.maxDepth;
+    }
+
+    // Perform command.
+    vkCmdSetViewport(mCommandBuffer, 0, 1, &newViewport);
+  }
+
+  void CommandBuffer::updateScissor(const Scissor& scissor) {
+    // Provide new scissor.
+    VkRect2D newScissor;
+    {
+      newScissor.extent = VkExtent2D{ scissor.extent.x, scissor.extent.y };
+      newScissor.offset = VkOffset2D{ scissor.offset.x, scissor.offset.y };
+    }
+
+    // Perform command.
+    vkCmdSetScissor(mCommandBuffer, 0, 1, &newScissor);
+  }
+
   void CommandBuffer::bindVertexBuffer(const ResourceBuffer* vertexBuffer) {
     // Expects.
     if (vertexBuffer == nullptr)

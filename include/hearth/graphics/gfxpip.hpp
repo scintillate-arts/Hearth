@@ -284,12 +284,6 @@ namespace HAPI_NAMESPACE_NAME::gfx {
       //! \brief The attribute descriptions for a vertex buffer that is compatible with this pipeline.
       std::vector<const AttributeDescription*> vertexAttributes;
 
-      //! \brief The viewports of the pipeline.
-      std::vector<const Viewport*> viewports;
-
-      //! \brief The scissors of the pipeline.
-      std::vector<const Scissor*> scissors;
-
       //! \brief The states of color blending the pipeline should apply.
       const ColorBlendState* colorBlending;
 
