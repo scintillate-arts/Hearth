@@ -185,9 +185,6 @@ namespace HAPI_NAMESPACE_NAME {
     bool quitting() const noexcept;
 
   private:
-    //! \brief Initializes this application.
-    void initialize();
-
     //! \brief Initializes the application window.
     void initializeWindow();
 
@@ -236,66 +233,72 @@ namespace HAPI_NAMESPACE_NAME {
     //! \brief Initializes the command buffer.
     void initializeCommandBuffer();
 
+    //! \brief Initializes this application.
+    void initialize();
+
     //! \brief Terminates this application.
     void terminate() noexcept;
 
     //! \brief Executes a frame of operations within the application.
     void executeFrame() noexcept;
 
+    //! \brief Rebuilds the swapchain and framebuffers.
+    void rebuildSwapChainAndFrameBuffers();
+
     /*!
      * \brief     Receives an emitted event and processes it.
      * \param[in] evnt The event that was emitted.
      * \return
      */
-    void onEvent(Event& evnt) noexcept;
+    void onEvent(Event& evnt);
 
     /*!
      * \brief     Called when the window closes, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onWindowClose(WindowCloseEvent& evnt) noexcept;
+    void onWindowClose(WindowCloseEvent& evnt);
 
     /*!
      * \brief     Called when the window gains or loses focus, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onWindowFocus(WindowFocusEvent& evnt) noexcept;
+    void onWindowFocus(WindowFocusEvent& evnt);
 
     /*!
      * \brief     Called when the window's framebuffer is resized, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onFrameBufferResize(FrameBufferResizeEvent& evnt) noexcept;
+    void onFrameBufferResize(FrameBufferResizeEvent& evnt);
 
     /*!
      * \brief     Called when the window is maximized or restored, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onWindowMaximize(WindowMaximizeEvent& evnt) noexcept;
+    void onWindowMaximize(WindowMaximizeEvent& evnt);
 
     /*!
      * \brief     Called when the window is minimized or restored, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onWindowMinimize(WindowMinimizeEvent& evnt) noexcept;
+    void onWindowMinimize(WindowMinimizeEvent& evnt);
 
     /*!
      * \brief     Called whenever the window is dragged around, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onWindowMoving(WindowMovingEvent& evnt) noexcept;
+    void onWindowMoving(WindowMovingEvent& evnt);
 
     /*!
      * \brief     Called whenever the window is resized, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onWindowResize(WindowResizeEvent& evnt) noexcept;
+    void onWindowResize(WindowResizeEvent& evnt);
 
     /*!
      * \brief     Called whenever the window is repositioned, via callback.
      * \param[in] evnt The event that was passed.
      */
-    void onWindowReposition(WindowRepositionEvent& evnt) noexcept;
+    void onWindowReposition(WindowRepositionEvent& evnt);
 
   private:
     //! \brief The timing information for this application.
@@ -354,6 +357,9 @@ namespace HAPI_NAMESPACE_NAME {
 
     //! \brief The command buffer used to record commands.
     std::unique_ptr<gfx::CommandBuffer> mCommandBuffer;
+
+    //! \brief Whether or not the window minimized.
+    bool mWindowMinimized;
   };
 
 }

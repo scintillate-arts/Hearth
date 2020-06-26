@@ -329,6 +329,36 @@ namespace HAPI_NAMESPACE_NAME::native {
       rect->bottom = rect->top  + height;
       break;
     }
+    case WM_MOVE: {
+      const auto xpos = static_cast<glm::i32>(LOWORD(lParam));
+      const auto ypos = static_cast<glm::i32>(HIWORD(lParam));
+      const auto  pos = glm::ivec2{ xpos, ypos };
+      EventBus::emit(WindowRepositionEvent{ window, pos });
+      window->mPosition = pos;
+      return FALSE;
+    }
+    case WM_SIZE: {
+      // Did we minimize or maximize?
+      const auto minimized = wParam == SIZE_MINIMIZED;
+      const auto maximized = wParam == SIZE_MAXIMIZED || (window->mMaximized && wParam != SIZE_RESTORED);
+      if (window->mMinimized != minimized)
+        EventBus::emit(WindowMinimizeEvent{ window, minimized });
+      if (window->mMaximized != maximized)
+        EventBus::emit(WindowMaximizeEvent{ window, maximized });
+
+      // Emit size changes.
+      const auto width  = static_cast<glm::u32>(LOWORD(lParam));
+      const auto height = static_cast<glm::u32>(HIWORD(lParam));
+      const auto size   = glm::uvec2{ width, height };
+      EventBus::emit(FrameBufferResizeEvent{ window, size });
+      EventBus::emit(WindowResizeEvent{ window, size });
+
+      // Set window properties.
+      window->mMaximized = maximized;
+      window->mMinimized = minimized;
+      window->mSize = size;
+      return FALSE;
+    }
     case WM_ERASEBKGND:
       return TRUE;
     case WM_NCACTIVATE:

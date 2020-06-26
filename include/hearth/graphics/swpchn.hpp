@@ -138,6 +138,12 @@ namespace HAPI_NAMESPACE_NAME::gfx {
      */
     void present(VkQueue presentQueue);
 
+    /*!
+     * \brief     Changes the resolution of the swapchain and it's images.
+     * \param[in] resolution The new resolution of the swapchain.
+     */
+    void reseat(const glm::uvec2& resolution);
+
   private:
     /*!
      * \brief     Initializes the swapchain proper, including images.
@@ -153,10 +159,10 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     void initializeSemaphores();
 
     /*!
-     * \brief     Rebuilds the swapchain when something about it changes.
-     * \param[in] resolution The new resolution of the swapchain images.
+     * \brief     Entirely rebuilds the swapchain.
+     * \param[in] resolution The new resolution of the swapchain.
      */
-    void rebuildSwapchain(const glm::uvec2& resolution);
+    void rebuildSwapChain(const glm::uvec2& resolution);
 
   private:
     //! \brief The surface this swapchain will be presenting images to.
@@ -175,7 +181,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     VkDevice mLogicalDevice;
 
     //! \brief The swapchain handle given to us by vulkan.
-    VkSwapchainKHR mSwapchain;
+    VkSwapchainKHR mSwapChain;
 
     //! \brief The semaphore signaled when an image is available.
     VkSemaphore mImageAvailable;

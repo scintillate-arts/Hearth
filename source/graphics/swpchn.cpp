@@ -95,7 +95,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     , mImageViews{ nullptr, nullptr, nullptr }
     , mPhysicalDevice(nullptr)
     , mLogicalDevice(nullptr)
-    , mSwapchain(nullptr)
+    , mSwapChain(nullptr)
     , mImageAvailable(nullptr)
     , mRenderFinished(nullptr)
     , mExtent{ 0, 0 }
@@ -111,7 +111,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     , mImageViews{ nullptr, nullptr, nullptr }
     , mPhysicalDevice(createInfo.physicalDevice)
     , mLogicalDevice(createInfo.logicalDevice)
-    , mSwapchain(nullptr)
+    , mSwapChain(nullptr)
     , mImageAvailable(nullptr)
     , mRenderFinished(nullptr)
     , mExtent{ 0, 0 }
@@ -127,7 +127,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
 
   SwapChain::~SwapChain() noexcept {
     // Didn't get created or was moved.
-    if (mSwapchain == nullptr)
+    if (mSwapChain == nullptr)
       return;
 
     // Wait for device.
@@ -140,7 +140,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     // Delete views and swapchain.
     for (auto imageView : mImageViews)
       vkDestroyImageView(mLogicalDevice, imageView, nullptr);
-    vkDestroySwapchainKHR(mLogicalDevice, mSwapchain, nullptr);
+    vkDestroySwapchainKHR(mLogicalDevice, mSwapChain, nullptr);
   }
 
   SwapChain::SwapChain(SwapChain&& other) noexcept
@@ -149,7 +149,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     , mImageViews(std::move(other.mImageViews))
     , mPhysicalDevice(std::move(other.mPhysicalDevice))
     , mLogicalDevice(std::move(other.mLogicalDevice))
-    , mSwapchain(std::move(other.mSwapchain))
+    , mSwapChain(std::move(other.mSwapChain))
     , mImageAvailable(std::move(other.mImageAvailable))
     , mRenderFinished(std::move(other.mRenderFinished))
     , mExtent(std::move(other.mExtent))
@@ -164,7 +164,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     other.mImageViews     = std::array<VkImageView, 3>{ nullptr, nullptr, nullptr };
     other.mPhysicalDevice = nullptr;
     other.mLogicalDevice  = nullptr;
-    other.mSwapchain      = nullptr;
+    other.mSwapChain      = nullptr;
     other.mImageAvailable = nullptr;
     other.mRenderFinished = nullptr;
   }
@@ -175,7 +175,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     std::swap(mImageViews,     other.mImageViews);
     std::swap(mPhysicalDevice, other.mPhysicalDevice);
     std::swap(mLogicalDevice,  other.mLogicalDevice);
-    std::swap(mSwapchain,      other.mSwapchain);
+    std::swap(mSwapChain,      other.mSwapChain);
     std::swap(mImageAvailable, other.mImageAvailable);
     std::swap(mRenderFinished, other.mRenderFinished);
     std::swap(mExtent,         other.mExtent);
@@ -195,7 +195,7 @@ namespace HAPI_NAMESPACE_NAME::gfx {
   }
 
   VkSwapchainKHR SwapChain::handle() const noexcept {
-    return mSwapchain;
+    return mSwapChain;
   }
 
   glm::uvec2 SwapChain::imageResolution() const noexcept {
@@ -211,8 +211,11 @@ namespace HAPI_NAMESPACE_NAME::gfx {
   }
 
   void SwapChain::present(VkQueue presentQueue) {
-    VkResult result = vkAcquireNextImageKHR(mLogicalDevice, mSwapchain, UINT64_MAX, mImageAvailable, VK_NULL_HANDLE, &mNextImage);
-    if (result != VK_SUCCESS)
+    VkResult result = vkAcquireNextImageKHR(mLogicalDevice, mSwapChain, UINT64_MAX, mImageAvailable, VK_NULL_HANDLE, &mNextImage);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+      rebuildSwapChain(glm::uvec2{ mExtent.width, mExtent.height });
+      return;
+    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
       throw std::runtime_error("Failed to acquire next image.");
 
     VkSemaphore          signalSemaphores[1] = { mRenderFinished };
@@ -243,14 +246,20 @@ namespace HAPI_NAMESPACE_NAME::gfx {
       presinfo.waitSemaphoreCount = 1;
       presinfo.pWaitSemaphores    = signalSemaphores;
       presinfo.swapchainCount     = 1;
-      presinfo.pSwapchains        = &mSwapchain;
+      presinfo.pSwapchains        = &mSwapChain;
       presinfo.pImageIndices      = &mNextImage;
       presinfo.pResults           = 0;
     }
 
     result = vkQueuePresentKHR(presentQueue, &presinfo);
-    if (result != VK_SUCCESS)
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+      rebuildSwapChain(glm::uvec2{ mExtent.width, mExtent.height });
+    else if (result != VK_SUCCESS)
       throw std::runtime_error("Failed to present.");
+  }
+
+  void SwapChain::reseat(const glm::uvec2& resolution) {
+    rebuildSwapChain(resolution);
   }
 
   void SwapChain::initializeSwapchain(const glm::uvec2& resolution, Format requestedFormat) {
@@ -306,13 +315,13 @@ namespace HAPI_NAMESPACE_NAME::gfx {
     }
 
     // Attempt to create swap chain.
-    VkResult result = vkCreateSwapchainKHR(mLogicalDevice, &swapchainCreateInfo, nullptr, &mSwapchain);
+    VkResult result = vkCreateSwapchainKHR(mLogicalDevice, &swapchainCreateInfo, nullptr, &mSwapChain);
     if (result != VK_SUCCESS)
       throw std::runtime_error("Failed to create swap chain.");
 
     // Obtain swapchain images.
-    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapchain, &imageCount, nullptr);
-    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapchain, &imageCount, mImages.data());
+    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapChain, &imageCount, nullptr);
+    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapChain, &imageCount, mImages.data());
 
     mFormat = surfaceFormat.format;
     mExtent = surfaceExtent;
@@ -369,37 +378,20 @@ namespace HAPI_NAMESPACE_NAME::gfx {
       throw std::runtime_error("Failed to create render finished semaphore");
   }
 
-  void SwapChain::rebuildSwapchain(const glm::uvec2& resolution) {
-    // Destroy views.
-    for (auto imageView : mImageViews)
-      vkDestroyImageView(mLogicalDevice, imageView, nullptr);
+  void SwapChain::rebuildSwapChain(const glm::uvec2& resolution) {
+    // Wait for device availability.
+    vkDeviceWaitIdle(mLogicalDevice);
 
-    // Get capabilities.
-    VkSurfaceCapabilitiesKHR capabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mPhysicalDevice, mSurfacePair.second, &capabilities);
+    // Delete image views.
+    for (auto view : mImageViews)
+      vkDestroyImageView(mLogicalDevice, view, nullptr);
 
-    // Get surface extent.
-    VkExtent2D surfaceExtent = chooseSwapchainExtent(capabilities, resolution.x, resolution.y);
+    // Delete swapchain entirely.
+    vkDestroySwapchainKHR(mLogicalDevice, mSwapChain, nullptr);
 
-    // Provide swapchain create info.
-    VkSwapchainCreateInfoKHR swpchnCreateInfo;
-    {
-      swpchnCreateInfo.sType        = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-      swpchnCreateInfo.pNext        = nullptr;
-      swpchnCreateInfo.flags        = 0;
-      swpchnCreateInfo.imageExtent  = surfaceExtent;
-      swpchnCreateInfo.oldSwapchain = mSwapchain;
-    }
-
-    // Attempt to create swap chain.
-    VkResult result = vkCreateSwapchainKHR(mLogicalDevice, &swpchnCreateInfo, nullptr, &mSwapchain);
-    if (result != VK_SUCCESS)
-      throw std::runtime_error("Failed to create swap chain.");
-
-    // Obtain swapchain images.
-    std::uint32_t imageCount = 0;
-    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapchain, &imageCount, nullptr);
-    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapchain, &imageCount, mImages.data());
+    // Recreate.
+    initializeSwapchain(resolution, static_cast<Format>(mFormat));
+    initializeImageViews();
   }
 
 }

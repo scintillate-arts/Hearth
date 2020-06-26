@@ -451,6 +451,7 @@ namespace HAPI_NAMESPACE_NAME {
     initializeGraphicsPipeline();
     initializeCommandPool();
     initializeCommandBuffer();
+    mWindowMinimized = false;
   }
 
   void Application::terminate() noexcept {
@@ -520,20 +521,22 @@ namespace HAPI_NAMESPACE_NAME {
       .extent = resolution
     };
 
-    mCommandBuffer->begin();
-    mCommandBuffer->updateBuffer(mUniformBuffer.get(), 0, &ubo, sizeof(UniformBufferObject));
-    mCommandBuffer->beginRenderPass(brpi);
-    mCommandBuffer->bindPipeline(mGraphicsPipeline.get(), gfx::PipelineBindPoint::Graphics);
-    mCommandBuffer->updateViewport(viewport);
-    mCommandBuffer->updateScissor(scissor);
-    mCommandBuffer->bindVertexBuffer(mVertexBuffer.get());
-    mCommandBuffer->bindIndexBuffer(mIndexBuffer.get());
-    mCommandBuffer->bindDescriptorSet(mUniformDescriptorSet.get(), mPipelineLayout.get());
-    mCommandBuffer->drawIndexed(6, 0, 0);
-    mCommandBuffer->endRenderPass();
-    mCommandBuffer->end();
-    mCommandBuffer->submit(mRenderContext->graphicsQueue());
-    mSwapChain->present(mRenderContext->presentQueue());
+    if (!mWindowMinimized) {
+      mCommandBuffer->begin();
+      mCommandBuffer->updateBuffer(mUniformBuffer.get(), 0, &ubo, sizeof(UniformBufferObject));
+      mCommandBuffer->beginRenderPass(brpi);
+      mCommandBuffer->bindPipeline(mGraphicsPipeline.get(), gfx::PipelineBindPoint::Graphics);
+      mCommandBuffer->updateViewport(viewport);
+      mCommandBuffer->updateScissor(scissor);
+      mCommandBuffer->bindVertexBuffer(mVertexBuffer.get());
+      mCommandBuffer->bindIndexBuffer(mIndexBuffer.get());
+      mCommandBuffer->bindDescriptorSet(mUniformDescriptorSet.get(), mPipelineLayout.get());
+      mCommandBuffer->drawIndexed(6, 0, 0);
+      mCommandBuffer->endRenderPass();
+      mCommandBuffer->end();
+      mCommandBuffer->submit(mRenderContext->graphicsQueue());
+      mSwapChain->present(mRenderContext->presentQueue());
+    }
 
     // Temporarily simulate frame execution, sleep half a frame time.
     std::this_thread::sleep_for(std::chrono::milliseconds(6));
@@ -544,10 +547,16 @@ namespace HAPI_NAMESPACE_NAME {
     mTiming.framesElapsed++;
   }
 
-  void Application::onEvent(Event& evnt) noexcept {
+  void Application::onEvent(Event& evnt) {
     switch (evnt.type()) {
     case EventType::WindowClose:
       onWindowClose(static_cast<WindowCloseEvent&>(evnt));
+      break;
+    case EventType::WindowMinimize:
+      onWindowMinimize(static_cast<WindowMinimizeEvent&>(evnt));
+      break;
+    case EventType::WindowResize:
+      onWindowResize(static_cast<WindowResizeEvent&>(evnt));
       break;
     default:
       // Re-emit to component systems.
@@ -555,8 +564,26 @@ namespace HAPI_NAMESPACE_NAME {
     }
   }
 
-  void Application::onWindowClose(WindowCloseEvent& evnt) noexcept {
+  void Application::onWindowClose(WindowCloseEvent& evnt) {
     quit(evnt.origin() == mMainWindow);
+    evnt.consume();
+  }
+
+  void Application::onWindowMinimize(WindowMinimizeEvent& evnt) {
+    mWindowMinimized = evnt.minimized();
+    evnt.consume();
+  }
+
+  void Application::onWindowResize(WindowResizeEvent& evnt) {
+    // Don't do anything if window minimized.
+    if (mWindowMinimized) {
+      evnt.consume();
+      return;
+    }
+
+    // Rebuild swapchain.
+    mSwapChain->reseat(evnt.windowSize());
+    initializeFrameBuffers(); // This should handle things okay.
     evnt.consume();
   }
 
