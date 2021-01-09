@@ -1,7 +1,3 @@
-//
-// Created by root on 11/5/2020.
-//
-
 /* Copyright (c) 2020 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
@@ -24,11 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * \file    OpenGLSurface.hpp
- * \brief   ...
- * \details ...
+ * \file
+ * \brief
+ * \details
  */
-#ifndef __HEARTHE_GFX_OPENGL_SURFACE_HPP__
-#define __HEARTHE_GFX_OPENGL_SURFACE_HPP__ 1
+#include <Hearth/Graphics/RenderContext.hpp>
+#include "OpenGL/OpenGLRenderContext.hpp"
 
-#endif /* __HEARTHE_GFX_OPENGL_SURFACE_HPP__ */
+namespace Hearth {
+
+  RenderContext* RenderContext::create(const CreateInfo* createInfo) noexcept {
+    RenderContext* result = nullptr;
+    try {
+      // Create context based on type.
+      switch (createInfo->requestedAPI) {
+      case GraphicsAPI::OpenGL:
+        result = new OpenGLRenderContext();
+        break;
+      }
+    } catch (const std::runtime_error& err) {
+      return nullptr;
+    }
+
+    return result;
+  }
+
+  void RenderContext::destroy(RenderContext* context) noexcept {
+    // Don't delete null pointer.
+    if (context == nullptr)
+      return;
+
+    // Delete proper context.
+    switch (context->gfxApi()) {
+    case GraphicsAPI::OpenGL:
+      delete dynamic_cast<OpenGLRenderContext*>(context);
+      break;
+    }
+  }
+
+}

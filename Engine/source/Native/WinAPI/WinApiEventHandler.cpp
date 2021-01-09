@@ -61,27 +61,13 @@ namespace Hearth {
     case WM_SHOWWINDOW:    return handleShowEvent(wnd, wParam);
     case WM_SIZE:          return handleSizeEvent(wnd, wParam, lParam);
     case WM_CHANGEUISTATE: return handleChangeUIStateEvent(wnd, hWnd, wParam);
-    case WM_UPDATEUISTATE: {
-      auto len = GetWindowTextLength(hWnd);
-      auto str = std::wstring{};
-          str.resize(len);
-      GetWindowText(hWnd, str.data(), len);
-      std::wcout << str << " received WM_UPDATEUISTATE\n";
-      break;
-    }
-    default:            break;
+    default:               break;
     }
 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
   }
 
   LRESULT HEARTHAPI WinAPIEventHandler::handleChangeUIStateEvent(const WinAPIWindow* wnd, HWND hWnd, WPARAM wParam) noexcept {
-    auto len = GetWindowTextLength(hWnd);
-    auto str = std::wstring{};
-        str.resize(len);
-    GetWindowText(hWnd, str.data(), len);
-    std::wcout << str << " received WM_CHANGEUISTATE\n";
-
     // Send event to children.
     for (auto child : wnd->mChildren) {
       auto childHandle = reinterpret_cast<HWND>(child->handle());

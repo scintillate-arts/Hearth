@@ -20,48 +20,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * \file    OpenGLRenderContext.hpp
- * \brief   ...
- * \details ...
+ * \file
+ * \brief
+ * \details
  */
-#ifndef __HEARTH_GFX_OPENGL_RENDER_CONTEXT_HPP__
-#define __HEARTH_GFX_OPENGL_RENDER_CONTEXT_HPP__ 1
-#include <Hearth/Graphics/RenderContext.hpp>
-#if HEARTH_GFX_OPENGL_API
+#ifndef __INC_HEARTH_GFX_OPENGL_WINAPI_SURFACE_HPP__
+#define __INC_HEARTH_GFX_OPENGL_WINAPI_SURFACE_HPP__ 1
+#include <Hearth/Core/Config.hpp>
+#include <Hearth/Graphics/Surface.hpp>
+#if HEARTH_WINDOWS_PLATFORM && HEARTH_GFX_OPENGL_API
+#include <GL/glew.h>
+#include <GL/wglew.h>
+#include "../../../Native/WinAPI/WinAPI.hpp"
 
 namespace Hearth {
 
-  /**
-   * \brief   ...
-   * \details ...
-   */
-  class OpenGLRenderContext : public RenderContext {
-  public:
+  struct WinAPIOpenGLSurface final : public Surface {
     /**
-     * \brief   Default constructor.
+     * \brief     Constructs a new \c WinAPIOpenGLSurface object.
+     * \details   ...
+     * \param[in] wnd The window to create the surface from.
+     */
+    explicit WinAPIOpenGLSurface(const Window* wnd);
+
+    /**
+     * \brief   Default destructor for \c WinAPIOpenGLSurface objects.
      * \details ...
      */
-    OpenGLRenderContext();
+    ~WinAPIOpenGLSurface() noexcept override;
 
+  private:
     /**
-     * \brief   Default destructor.
+     * \brief   The device context for the window.
      * \details ...
      */
-    ~OpenGLRenderContext() noexcept override;
-
-  public:
-    /**
-     * \copydoc RenderContext::createSurface(const Window*)
-     */
-    Surface* createSurface(const Window* wnd) noexcept override;
+    HDC mDeviceContext = nullptr;
 
     /**
-     * \copydoc RenderContext::destroySurface(Surface*)
+     * \brief   The render context object from WGL.
+     * \details ...
      */
-    void destroySurface(Surface* surface) noexcept override;
+    HGLRC mRenderContext = nullptr;
   };
 
 }
 
-#endif /* HEARTH_GFX_OPENGL_API */
-#endif /* __HEARTH_GFX_OPENGL_RENDER_CONTEXT_HPP__ */
+#endif /* Windows Platform and OpenGL API */
+#endif /* __INC_HEARTH_GFX_OPENGL_WINAPI_SURFACE_HPP__ */

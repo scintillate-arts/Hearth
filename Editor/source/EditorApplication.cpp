@@ -35,6 +35,7 @@ namespace Hearth {
   }
 
   void EditorApplication::onInitialize() {
+    // Create application window.
     const Window::CreateInfo wndCreateInfo {
       .environment = Environment::instance(),
       .wndTitle    = L"Hearth Fire",
@@ -45,9 +46,23 @@ namespace Hearth {
 
     mAppWindow = Window::create(&wndCreateInfo);
     mAppWindow->show();
+
+    // Create render context.
+    const RenderContext::CreateInfo rdrctxCreateInfo {
+      .app          = this,
+      .requestedAPI = GraphicsAPI::OpenGL
+    };
+
+    mRenderContext = RenderContext::create(&rdrctxCreateInfo);
+
+    // Create render surface.
+    mRenderSurface = mRenderContext->createSurface(mAppWindow);
   }
 
   void EditorApplication::onTerminate() noexcept {
+    mRenderContext->destroySurface(mRenderSurface);
+    RenderContext::destroy(mRenderContext);
+    Window::destroy(mAppWindow);
   }
 
   void EditorApplication::onWindowClose(WindowCloseEvent* wce) noexcept {

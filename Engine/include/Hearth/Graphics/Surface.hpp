@@ -26,15 +26,27 @@
  */
 #ifndef __HEARTH_GFX_SURFACE_HPP__
 #define __HEARTH_GFX_SURFACE_HPP__ 1
+#include "../Core/Config.hpp"
+#if HEARTH_GFX_OPENGL_API
 
 namespace Hearth {
 
+  // Forward.
+  struct Window;
+
   /**
-   * \brief
+   * \brief   Represents a rendering surface for the graphics APIs.
+   * \details ...
    */
-  struct ISurface final {
+  struct Surface {
+    /**
+     * \brief   Default destructor for \c Surface objects.
+     * \details ...
+     */
+    virtual ~Surface() noexcept = default;
   };
 
 }
 
+#endif /* HEARTH_GFX_OPENGL_API */
 #endif /* __HEARTH_GFX_SURFACE_HPP__ */

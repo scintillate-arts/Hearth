@@ -27,7 +27,7 @@ message(STATUS "GLM and GLEW made available")
 
 # Build primary library.
 add_library(hearth_engine INTERFACE)
-target_compile_definitions(hearth_engine INTERFACE GLEW_STATIC)
+target_compile_definitions(hearth_engine INTERFACE UNICODE INTERFACE GLEW_STATIC)
 target_link_libraries(
   hearth_engine
   INTERFACE hearth_project_settings
@@ -56,11 +56,11 @@ if(WIN32)
   target_link_libraries(hearth_native INTERFACE hearth_winapi)
 endif()
 
-# Build GFX OpenGL library.
-file(GLOB_RECURSE GFX_OPENGL_SOURCES false "./Graphics/OpenGL/" "*.cpp")
-add_library(hearth_opengl STATIC ${GFX_OPENGL_SOURCES})
-add_library(hearth::opengl ALIAS hearth_opengl)
-target_link_libraries(hearth_opengl PUBLIC hearth_engine)
+# Full graphics library.
+file(GLOB_RECURSE GFX_SOURCES false "./Graphics/" "*.cpp")
+add_library(hearth_graphics STATIC ${GFX_SOURCES})
+add_library(hearth::graphics ALIAS hearth_graphics)
+target_link_libraries(hearth_graphics PUBLIC hearth_engine)
 
 # Build all in one target.
 add_library(hearth INTERFACE)
@@ -68,7 +68,7 @@ target_link_libraries(
   hearth
   INTERFACE hearth::core
   INTERFACE hearth::native
-  INTERFACE hearth::opengl
+  INTERFACE hearth::graphics
 )
 
 # Build benchmarks.

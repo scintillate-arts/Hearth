@@ -26,22 +26,38 @@
  */
 #include <GL/glew.h>
 #include "OpenGLRenderContext.hpp"
+#if HEARTH_WINDOWS_PLATFORM
+#  include "WinAPI/Surface.hpp"
+#endif
+#if HEARTH_GFX_OPENGL_API
 
 namespace Hearth {
 
   OpenGLRenderContext::OpenGLRenderContext() {
-
   }
 
   OpenGLRenderContext::~OpenGLRenderContext() noexcept {
-
   }
 
-  ISurface* OpenGLRenderContext::createSurface(const IWindow *wnd) noexcept {
-    return nullptr;
+  Surface* OpenGLRenderContext::createSurface(const Window *wnd) noexcept {
+    Surface* result;
+    try {
+    #if HEARTH_WINDOWS_PLATFORM
+      result = new WinAPIOpenGLSurface(wnd);
+    #endif /* Platform specific */
+    } catch (const std::runtime_error& err) {
+      return nullptr;
+    }
+
+    return result;
   }
 
-  void OpenGLRenderContext::destroySurface(ISurface *surface) noexcept {
+  void OpenGLRenderContext::destroySurface(Surface *surface) noexcept {
+  #if HEARTH_WINDOWS_PLATFORM
+    delete dynamic_cast<WinAPIOpenGLSurface*>(surface);
+  #endif /* Platform specific */
   }
 
 }
+
+#endif /* HEARTH_GFX_OPENGL_API */

@@ -28,6 +28,8 @@
 #define __HEARTH_FIRE_EDITOR_APPLICATION_HPP__ 1
 #include <Hearth/Core/Application.hpp>
 #include <Hearth/Core/Window.hpp>
+#include <Hearth/Graphics/RenderContext.hpp>
+#include <Hearth/Graphics/Surface.hpp>
 
 namespace Hearth {
   /**
@@ -74,6 +76,18 @@ namespace Hearth {
      * \details ...
      */
     Window* mAppWindow;
+
+    /**
+     * \brief   The render context for the application.
+     * \details ...
+     */
+    RenderContext* mRenderContext;
+
+    /**
+     * \brief   The surface the application will render to.
+     * \details ...
+     */
+    Surface* mRenderSurface;
   };
 
 }

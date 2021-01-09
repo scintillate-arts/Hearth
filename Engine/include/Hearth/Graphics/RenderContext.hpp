@@ -38,7 +38,7 @@ namespace Hearth {
 
   // Foward.
   class Application;
-  struct IWindow;
+  struct Window;
 
   /**
    * \brief   Describes the different types of graphics API's available.
@@ -54,36 +54,54 @@ namespace Hearth {
   };
 
   /**
-   * \brief   The information needed to create a new render context.
-   * \details ...
-   */
-  struct RenderContextCreateInfo {
-    /**
-     * \brief   The application to register the render context with.
-     * \details Application's can have multiple render contexts. But the contexts are not owned by
-     *          the Application. They are owned by the renderer they come from.
-     */
-    const Application* app;
-
-    /**
-     * \brief   The requested graphics API to be used by the render context.
-     * \details If graphics API that is not enabled is selected, a runtime error will be thrown.
-     */
-    GraphicsAPI requestedAPI;
-  };
-
-  /**
    * \brief   Represents
    * \details Render contexts are responsible for creating resources that pertain to the graphics
    *          API the context was create for. All resources are shared by from the render context
    *          therefore the render context handles their allocations and deallocations.
    */
-  struct IRenderContext {
+  struct RenderContext {
+    /**
+     * \brief   The information needed to create a new render context.
+     * \details ...
+     */
+    struct CreateInfo final {
+      /**
+       * \brief   The application to register the render context with.
+       * \details Application's can have multiple render contexts. But the contexts are not owned by
+       *          the Application. They are owned by the renderer they come from.
+       */
+      const Application* app;
+
+      /**
+       * \brief   The requested graphics API to be used by the render context.
+       * \details If graphics API that is not enabled is selected, a runtime error will be thrown.
+       */
+      GraphicsAPI requestedAPI;
+    };
+
+  public:
+    /**
+     * \brief   Creates a render context from the given information.
+     * \details The returned render context will be valid if provided create information is also
+     *          valid. A case where the information may not be valid is, if the application or
+     *          window is null, or if the requested graphics API is not enabled for the platform.
+     * \returns A pointer to a render context instance, if created, otherwise nullptr.
+     */
+    static RenderContext* create(const CreateInfo* createInfo) noexcept;
+
+    /**
+     * \brief     Destroys a render context.
+     * \details   ...
+     * \param[in] rdrctx The render context to destroy.
+     */
+    static void destroy(RenderContext* context) noexcept;
+
+  public:
     /**
      * \brief   Default destructor.
      * \details ...
      */
-    virtual ~IRenderContext() noexcept = default;
+    virtual ~RenderContext() noexcept = default;
 
     /**
      * \brief     Creates a new surface from the given window.
@@ -91,14 +109,14 @@ namespace Hearth {
      * \param[in] wnd The window to create a surface from.
      * \returns   The created surface if successful or nullptr if failed.
      */
-    virtual ISurface* createSurface(const IWindow* wnd) noexcept = 0;
+    virtual Surface* createSurface(const Window* wnd) noexcept = 0;
 
     /**
      * \brief     Destroys a provided surface.
      * \details   Because of
      * \param[in] surface The surface to destroy.
      */
-    virtual void destroySurface(ISurface* surface) noexcept = 0;
+    virtual void destroySurface(Surface* surface) noexcept = 0;
 
   public:
     /**
@@ -116,24 +134,6 @@ namespace Hearth {
      */
     GraphicsAPI mGraphicsAPI = GraphicsAPI::Undefined;
   };
-
-  /**
-   * \brief   Creates a render context from the given information.
-   * \details The returned render context will be valid if provided create information is also
-   *          valid. A case where the information may not be valid is, if the application or
-   *          window is null, or if the requested graphics API is not enabled for the platform.
-   * \returns A pointer to a render context instance, if created, otherwise nullptr.
-   */
-  HEARTHAPI  IRenderContext*
-  HEARTHCALL createRenderContext(const RenderContextCreateInfo* createInfo) noexcept;
-
-  /**
-   * \brief     Destroys a render context.
-   * \details   ...
-   * \param[in] rdrctx The render context to destroy.
-   * */
-  HEARTHAPI  void
-  HEARTHCALL destroyRenderContext(IRenderContext* rdrctx) noexcept;
 
 }
 
