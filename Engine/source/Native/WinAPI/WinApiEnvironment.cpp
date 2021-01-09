@@ -50,8 +50,8 @@ namespace Hearth {
     mWindowClass.style         = CS_DBLCLKS | CS_HREDRAW | CS_OWNDC | CS_VREDRAW;
     mWindowClass.hInstance     = GetModuleHandle(nullptr);
     mWindowClass.lpfnWndProc   = &WinAPIEventHandler::wndProc;
-    mWindowClass.lpszClassName = IWindow::kClassName.data();
-    mWindowClass.lpszMenuName  = IWindow::kMenuName.data();
+    mWindowClass.lpszClassName = Window::kClassName.data();
+    mWindowClass.lpszMenuName  = Window::kMenuName.data();
     if (mWindowClass.hInstance == nullptr)
       std::cout << "Hmm seems fishy.\n";
 
@@ -108,7 +108,7 @@ namespace Hearth {
     // Check if this was a CTRL+C event.
     if (dwCtrlType == CTRL_C_EVENT) {
       // Get the running environment.
-      auto env = getEnvironment();
+      auto env = Environment::instance();
       for (auto app : env->trackedApps())
         app->quit(true);
       return TRUE;
@@ -170,9 +170,8 @@ namespace Hearth {
     return IsWindows10OrLater(16299);
   }
 
-  HEARTHAPI  std::shared_ptr<IEnvironment>
-  HEARTHCALL getEnvironment() noexcept {
-    static std::shared_ptr<IEnvironment> spSingleton = std::make_shared<WinAPIEnvironment>();
+  std::shared_ptr<Environment> Environment::instance() noexcept {
+    static std::shared_ptr<Environment> spSingleton = std::make_shared<WinAPIEnvironment>();
     return spSingleton;
   }
 

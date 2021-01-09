@@ -35,13 +35,13 @@ namespace Hearth {
   }
 
   void EditorApplication::onInitialize() {
-    const WindowCreateInfo wndCreateInfo {
-      .environment = getEnvironment(),
+    const Window::CreateInfo wndCreateInfo {
+      .environment = Environment::instance(),
       .wndTitle    = L"Hearth Fire",
       .wndSize     = glm::uvec2{ 1280, 720 },
       .wndPosition = glm::ivec2{ 640, 360 }
     };
-    mAppWindow = createWindow(&wndCreateInfo);
+    mAppWindow = Window::create(&wndCreateInfo);
     mAppWindow->show();
   }
 

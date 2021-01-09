@@ -47,12 +47,21 @@ namespace Hearth {
    * \brief    Responsible for enabling the environment the application runs in.
    * \details ...
    * */
-  struct IEnvironment {
+  struct Environment {
+    /**
+     * \brief   Gets or creates the environment singleton.
+     * \details The environment singleton will only be created if it hasn't already. Otherwise the singleton will be returned.
+     * 					This function is implemented by it's appropriate platfrom.
+     * \returns The environment singleton.
+     */
+    static std::shared_ptr<Environment> instance() noexcept;
+
+  public:
     /**
      * \brief   Default destructor for environments.
      * \details Must be provided for polymorphic types.
      * */
-    virtual ~IEnvironment() noexcept = default;
+    virtual ~Environment() noexcept = default;
 
     /**
      * \brief   Initializes the environment at the beginning of the application execution.
@@ -139,15 +148,6 @@ namespace Hearth {
      */
     bool mIsInitialized = false;
   };
-
-  /**
-   * \brief   Gets or creates the environment singleton.
-   * \details The environment singleton will only be created if it hasn't already. Otherwise the singleton will be returned.
-   * 					This function is implemented by it's appropriate platfrom.
-   * \returns The environment singleton.
-   */
-  HEARTHAPI  std::shared_ptr<IEnvironment>
-  HEARTHCALL getEnvironment() noexcept;
 
 }
 

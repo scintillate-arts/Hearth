@@ -40,7 +40,7 @@ namespace Hearth {
    * \brief 	A WinAPI implementation of the window interface.
    * \details ...
    */
-  class WinAPIWindow : public IWindow{
+  class WinAPIWindow : public Window {
     // Can access the protected members to set them.
     friend class WinAPIEventHandler;
 
@@ -57,7 +57,7 @@ namespace Hearth {
      * \details 	...
      * \param[in] createInfo The information needed to create the window.
      */
-    explicit WinAPIWindow(const WindowCreateInfo* createInfo);
+    explicit WinAPIWindow(const Window::CreateInfo* createInfo);
 
     /**
      * \brief 	Makes sure the native window is destroyed properly.

@@ -34,7 +34,7 @@ namespace Hearth {
    * \brief		The information needed to create the editor application.
    * \details ...
    * */
-  constexpr ApplicationCreateInfo kEditorCreateInfo {
+  constexpr Application::CreateInfo kEditorCreateInfo {
     .appName     = "Hearth Fire",
     .companyName = "Simular Games, LLC.",
     .appVersion  = Version::v1_0_0
@@ -73,7 +73,7 @@ namespace Hearth {
      * \brief 	The application window.
      * \details ...
      */
-    IWindow* mAppWindow;
+    Window* mAppWindow;
   };
 
 }

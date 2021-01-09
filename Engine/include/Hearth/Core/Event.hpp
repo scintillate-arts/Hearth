@@ -31,7 +31,7 @@
 namespace Hearth {
 
   // Forward.
-  struct IWindow;
+  struct Window;
 
   /**
    * \brief   Represents the different types of events there are.
@@ -108,7 +108,7 @@ namespace Hearth {
      * \param[in] window The window that had an event triggered on it.
      * \param[in] type The type of the window event.
      */
-    explicit WindowEvent(const IWindow* window, EventType type) noexcept
+    explicit WindowEvent(const Window* window, EventType type) noexcept
       : mWindow{ window }
     {
       mType = type;
@@ -121,14 +121,14 @@ namespace Hearth {
      * \returns The window that the event triggered for.
      */
     [[nodiscard]]
-    const IWindow* window() const noexcept { return mWindow; }
+    const Window* window() const noexcept { return mWindow; }
 
   private:
     /**
      * \brief   The window the event happened on.
      * \details ...
      */
-    const IWindow* mWindow;
+    const Window* mWindow;
   };
 
   /**
@@ -142,7 +142,7 @@ namespace Hearth {
      * \details   ...
      * \param[in] wnd The window to create this event from.
      */
-    explicit WindowCloseEvent(const IWindow* wnd) noexcept
+    explicit WindowCloseEvent(const Window* wnd) noexcept
       : WindowEvent(wnd, EventType::WindowClose)
     { }
   };
@@ -159,7 +159,7 @@ namespace Hearth {
      * \param[in] wnd The window to create this event from.
      * \param[in] focused Whether or not the window was focused.
      */
-    explicit WindowFocusEvent(const IWindow* wnd, bool focused) noexcept
+    explicit WindowFocusEvent(const Window* wnd, bool focused) noexcept
       : WindowEvent(wnd, EventType::WindowFocus)
       , mFocused(focused)
     { }
@@ -193,7 +193,7 @@ namespace Hearth {
      * \param[in] wnd The window to create this event from.
      * \param[in] pos The new position of the window.
      */
-    explicit WindowMoveEvent(const IWindow* wnd, glm::ivec2 pos) noexcept
+    explicit WindowMoveEvent(const Window* wnd, glm::ivec2 pos) noexcept
       : WindowEvent(wnd, EventType::WindowMove)
       , mPosition{ pos }
     { }
@@ -227,7 +227,7 @@ namespace Hearth {
      * \param[in] wnd The window to create this event from.
      * \param[in] visible Whether or not the window is visible.
      */
-    explicit WindowShowEvent(const IWindow* wnd, bool visible) noexcept
+    explicit WindowShowEvent(const Window* wnd, bool visible) noexcept
       : WindowEvent(wnd, EventType::WindowShow)
       , mVisible(visible)
     { }
@@ -273,7 +273,7 @@ namespace Hearth {
      * \param[in] size The new size of the window.
      * \param[in] sizeState The new size state of the window.
      */
-    explicit WindowSizeEvent(const IWindow* wnd, glm::uvec2 size, SizeState sizeState) noexcept
+    explicit WindowSizeEvent(const Window* wnd, glm::uvec2 size, SizeState sizeState) noexcept
       : WindowEvent(wnd, EventType::WindowSize)
       , mSize(size)
       , mSizeState(sizeState)

@@ -35,41 +35,42 @@
 namespace Hearth {
 
   /**
-   * \brief   The necessary information to create a new application.
-   * \details ...
-   */
-  struct ApplicationCreateInfo final {
-    /**
-     * \brief   The name of the application to create.
-     * \details ...
-     */
-    std::string_view appName;
-
-    /**
-     * \brief   The name of the company or user that created the application.
-     * \details ...
-     */
-    std::string_view companyName;
-
-    /**
-     * \brief   The version of the application to create.
-     * \details ...
-     */
-    Version appVersion;
-  };
-
-  /**
    * \brief    A base implementation of an application ran and managed by Hearth.
    * \details ...
    */
   class Application {
   public:
     /**
+     * \brief   The necessary information to create a new application.
+     * \details ...
+     */
+    struct CreateInfo final {
+      /**
+       * \brief   The name of the application to create.
+       * \details ...
+       */
+      std::string_view appName;
+
+      /**
+       * \brief   The name of the company or user that created the application.
+       * \details ...
+       */
+      std::string_view companyName;
+
+      /**
+       * \brief   The version of the application to create.
+       * \details ...
+       */
+      Version appVersion;
+    };
+
+  public:
+    /**
      * \brief     Creates a new application instance from the given create information.
      * \details   ...
      * \param[in] pAppCreateInfo A pointer to the information needed to create an application.
      */
-    explicit Application(const ApplicationCreateInfo* pAppCreateInfo);
+    explicit Application(const CreateInfo* pAppCreateInfo);
 
     /**
      * \brief   Default destructor.
@@ -180,7 +181,7 @@ namespace Hearth {
      * \brief   A pointer to the environment singleton.
      * \details The application must use this to initialize the the platform dependent code.
      */
-    std::shared_ptr<IEnvironment> mEnvironment;
+    std::shared_ptr<Environment> mEnvironment;
 
     /**
      * \brief   The name of this application.

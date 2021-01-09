@@ -42,40 +42,10 @@ namespace Hearth {
   typedef struct tagWindowHandle* WindowHandle;
 
   /**
-   * \brief	  The necessary information needed to create a window.
-   * \details ...
-   */
-  struct WindowCreateInfo {
-    /**
-     * \brief   The environment the window is being created for.
-     * \details ...
-     */
-    std::shared_ptr<IEnvironment> environment;
-
-    /**
-     * \brief   The title of the window.
-     * \details ...
-     */
-    std::wstring_view wndTitle;
-
-    /**
-     * \brief   The size of the window we want to create.
-     * \details ...
-     */
-    glm::uvec2 wndSize;
-
-    /**
-     * \brief   The position of the window we want to create.
-     * \details ...
-     */
-    glm::ivec2 wndPosition;
-  };
-
-  /**
-   * \brief	  Represents the an abstraction of the window class.
+   * \brief	  Represents an abstraction of the window class.
    * \details	...
    */
-  struct IWindow {
+  struct Window {
     /**
      * \brief   The name of the class that is used by Hearth.
      * \details ...
@@ -88,11 +58,60 @@ namespace Hearth {
      */
     static constexpr std::wstring_view kMenuName = L"Hearth::Window::Menu";
 
+  public:
+    /**
+     * \brief	  The necessary information needed to create a window.
+     * \details ...
+     */
+    struct CreateInfo final {
+      /**
+       * \brief   The environment the window is being created for.
+       * \details ...
+       */
+      std::shared_ptr<Environment> environment;
+
+      /**
+       * \brief   The title of the window.
+       * \details ...
+       */
+      std::wstring_view wndTitle;
+
+      /**
+       * \brief   The size of the window we want to create.
+       * \details ...
+       */
+      glm::uvec2 wndSize;
+
+      /**
+       * \brief   The position of the window we want to create.
+       * \details ...
+       */
+      glm::ivec2 wndPosition;
+    };
+
+  public:
+    /**
+     * \brief 	  Creates a new window from the given create information.
+     * \details   This function constructs a window on the appropriate environment and returns it. The caller is the owner
+     * 					  of the created window.
+     * \param[in] createInfo The information needed to create the window.
+     * \returns   A pointer to the created window.
+     */
+    static Window* create(const CreateInfo* createInfo) noexcept;
+
+    /**
+     * \brief     Destroys the given window.
+     * \details   ...
+     * \param[in] window The window to destroy.
+     */
+    static void destroy(Window* wnd) noexcept;
+
+  public:
     /**
      * \brief   Default destructor for window types.
      * \details ...
      */
-    virtual ~IWindow() noexcept = default;
+    virtual ~Window() noexcept = default;
 
     /**
      * \brief   Unfocuses the window.
@@ -361,24 +380,6 @@ namespace Hearth {
   private:
     char unused : 2 = 0; // This is to pad out the struct.
   };
-
-  /**
-   * \brief 	  Creates a new window from the given create information.
-   * \details   This function constructs a window on the appropriate environment and returns it. The caller is the owner
-   * 					  of the created window.
-   * \param[in] createInfo The information needed to create the window.
-   * \returns   A pointer to the created window.
-   */
-  HEARTHAPI  IWindow*
-  HEARTHCALL createWindow(const WindowCreateInfo* createInfo) noexcept;
-
-  /**
-   * \brief     Destroys the given window.
-   * \details   ...
-   * \param[in] window The window to destroy.
-   */
-  HEARTHAPI  void
-  HEARTHCALL destroyWindow(IWindow* window) noexcept;
 
 }
 

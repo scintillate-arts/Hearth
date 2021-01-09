@@ -30,8 +30,8 @@
 
 namespace Hearth {
 
-  Application::Application(const Hearth::ApplicationCreateInfo *pAppCreateInfo)
-    : mEnvironment{ getEnvironment() }
+  Application::Application(const Application::CreateInfo *pAppCreateInfo)
+    : mEnvironment{ Environment::instance() }
     , mName(pAppCreateInfo->appName)
     , mCompanyName(pAppCreateInfo->companyName)
     , mVersionNo(pAppCreateInfo->appVersion)

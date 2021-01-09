@@ -38,25 +38,25 @@ namespace Hearth {
    * \brief 	A window's specific implementation of the Environment.
    * \details ...
    */
-  class WinAPIEnvironment : public IEnvironment {
+  class WinAPIEnvironment : public Environment {
   public:
     /**
-     * \copydoc IEnvironment::initialize()
+     * \copydoc Environment::initialize()
      */
     void initialize() noexcept override;
 
     /**
-     * \copydoc IEnvironment::terminate()
+     * \copydoc Environment::terminate()
      */
     void terminate() noexcept override;
 
     /**
-     * \copydoc IEnvironment::pollEvents()
+     * \copydoc Environment::pollEvents()
      */
     void pollEvents() const noexcept override;
 
     /**
-     * \copydoc IEnvironment::platform()
+     * \copydoc Environment::platform()
      * \returns The correct platform, in this case Platform::Windows.
      */
     [[nodiscard]]

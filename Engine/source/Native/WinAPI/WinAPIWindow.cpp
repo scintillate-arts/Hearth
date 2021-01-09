@@ -30,7 +30,7 @@
 
 namespace Hearth {
 
-  WinAPIWindow::WinAPIWindow(const WindowCreateInfo *createInfo) {
+  WinAPIWindow::WinAPIWindow(const Window::CreateInfo *createInfo) {
     // Get environment.
     auto winEnv = dynamic_cast<const WinAPIEnvironment*>(createInfo->environment.get());
     auto wndCls = winEnv->windowClass();
@@ -226,9 +226,8 @@ namespace Hearth {
     SetWindowText(mNativeHandle, title.data());
   }
 
-  HEARTHAPI  IWindow*
-  HEARTHCALL createWindow(const WindowCreateInfo* createInfo) noexcept {
-    IWindow* result = nullptr;
+  Window* Window::create(const Window::CreateInfo* createInfo) noexcept {
+    Window* result = nullptr;
     try {
       result = new WinAPIWindow(createInfo);
     } catch (const std::runtime_error& err) {
@@ -237,8 +236,7 @@ namespace Hearth {
     return result;
   }
 
-  HEARTHAPI  void
-  HEARTHCALL destroyWindow(IWindow* window) noexcept {
+  void Window::destroy(Window* window) noexcept {
     try {
       delete dynamic_cast<WinAPIWindow*>(window);
     } catch (const std::runtime_error& err) {
