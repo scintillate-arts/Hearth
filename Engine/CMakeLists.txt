@@ -20,8 +20,8 @@ FetchContent_Declare(
 message(STATUS "Fetch complete")
 
 # Make tools available.
-set(glew-cmake_BUILD_SHARED OFF)
-set(ONLY_LIBS ON)
+set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(ONLY_LIBS ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glm glew)
 message(STATUS "GLM and GLEW made available")
 

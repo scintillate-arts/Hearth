@@ -24,34 +24,25 @@ FetchContent_Declare(
   GIT_PROGRESS   TRUE
 )
 message(STATUS "Fetched Googlebenchmark")
+message(STATUS "Fetching SPDLog...")
+FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+  GIT_TAG        master
+  GIT_SHALLOW    TRUE
+  GIT_PROGRESS   TRUE
+)
+message(STATUS "Fetched SPDLog")
 
 # Make the tools available.
-set(BUILD_GMOCK OFF)
-set(INSTALL_GTEST OFF)
-set(BENCHMARK_ENABLE_TESTING OFF)
-set(ENABLE_INSTALL OFF)
-set(ENABLE_GTEST_TESTS OFF)
-FetchContent_MakeAvailable(gtest gbench)
-message(STATUS "Googletest and Googlebenchmark made available")
-
-# Populate if necessary.
-message(STATUS "Checking gtest population...")
-FetchContent_GetProperties(gtest)
-if(NOT gtest_POPULATED)
-  message(STATUS "Populating gtest...")
-  FetchContent_Populate(gtest)
-else()
-  message(STATUS "gtest populated")
-endif()
-
-# Populate if necessary.
-message(STATUS "Checking gbench population...")
-if(NOT gbench_POPULATED)
-  message(STATUS "Populating gbench...")
-  FetchContent_Poplulate(gbench)
-else()
-  message(STATUS "gbench populated")
-endif()
+set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+set(SPDLOG_MASTER_PROJECT OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(gtest gbench spdlog)
+message(STATUS "Googletest, Googlebenchmark, and SPDLog made available")
 
 # Needed files for building.
 include(CMake/ProjectSettings.cmake)
