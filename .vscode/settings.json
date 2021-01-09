@@ -1,0 +1,7 @@
+{
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "cmake.configureOnEdit": false,
+  "cmake.generator": "MinGW Makefiles",
+  "cmake.setBuildTypeOnMultiConfig": true,
+  "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}"
+}
