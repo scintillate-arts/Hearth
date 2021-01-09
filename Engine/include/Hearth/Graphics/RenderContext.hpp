@@ -31,7 +31,7 @@
 #ifndef __HEARTH_GFX_RENDER_CONTEXT_HPP__
 #define __HEARTH_GFX_RENDER_CONTEXT_HPP__ 1
 #include <memory>
-#include "../Core/Config.hpp"
+#include "../Config.hpp"
 #include "Surface.hpp"
 
 namespace Hearth {

@@ -29,7 +29,7 @@
 #include <memory>
 #include <set>
 #include <stdexcept>
-#include "Config.hpp"
+#include "../Config.hpp"
 
 namespace Hearth {
 

@@ -26,7 +26,7 @@
  */
 #ifndef __HEARTH_NATIVE_WINAPI_EVENTHANDLER_HPP__
 #define __HEARTH_NATIVE_WINAPI_EVENTHANDLER_HPP__ 1
-#include <Hearth/Core/Config.hpp>
+#include <Hearth/Config.hpp>
 
 /* Window specific */
 #if HEARTH_WINDOWS_PLATFORM

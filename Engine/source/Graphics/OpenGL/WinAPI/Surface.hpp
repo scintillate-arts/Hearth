@@ -26,7 +26,6 @@
  */
 #ifndef __INC_HEARTH_GFX_OPENGL_WINAPI_SURFACE_HPP__
 #define __INC_HEARTH_GFX_OPENGL_WINAPI_SURFACE_HPP__ 1
-#include <Hearth/Core/Config.hpp>
 #include <Hearth/Graphics/Surface.hpp>
 #if HEARTH_WINDOWS_PLATFORM && HEARTH_GFX_OPENGL_API
 #include <GL/glew.h>

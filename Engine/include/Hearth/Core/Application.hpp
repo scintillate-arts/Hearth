@@ -27,7 +27,7 @@
 #ifndef __HEARTH_CORE_APPLICATION_HPP__
 #define __HEARTH_CORE_APPLICATION_HPP__ 1
 #include <string_view>
-#include "Config.hpp"
+#include "../Config.hpp"
 #include "Event.hpp"
 #include "Environment.hpp"
 #include "Version.hpp"

@@ -26,7 +26,7 @@
  */
 #ifndef __HEARTH_NATIVE_WINAPI_HPP__
 #define __HEARTH_NATIVE_WINAPI_HPP__ 1
-#include <Hearth/Core/Config.hpp>
+#include <Hearth/Config.hpp>
 
 // First verison of the UNICODE macro defined by Windows.
 #ifndef UNICODE

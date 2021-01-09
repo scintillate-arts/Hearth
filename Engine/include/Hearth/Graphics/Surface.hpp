@@ -26,7 +26,7 @@
  */
 #ifndef __HEARTH_GFX_SURFACE_HPP__
 #define __HEARTH_GFX_SURFACE_HPP__ 1
-#include "../Core/Config.hpp"
+#include "../Config.hpp"
 #if HEARTH_GFX_OPENGL_API
 
 namespace Hearth {
