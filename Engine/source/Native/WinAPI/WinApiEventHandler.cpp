@@ -24,6 +24,7 @@
  * \brief   ...
  * \details ...
  */
+#include <iostream>
 #include <Hearth/Core/Application.hpp>
 #include "../../Core/EventDispatcher.hpp"
 #include "WinApiEnvironment.hpp"
@@ -51,18 +52,43 @@ namespace Hearth {
     }
 
     switch (uMsg) {
-    case WM_CLOSE:      return handleCloseEvent(wnd);
-    case WM_DESTROY:    return handleDestroyEvent(wnd);
-    case WM_ERASEBKGND: return TRUE;
-    case WM_KILLFOCUS:  return handleFocusEvent(wnd, false);
-    case WM_MOVE:       return handleMoveEvent(wnd, lParam);
-    case WM_SETFOCUS:   return handleFocusEvent(wnd, true);
-    case WM_SHOWWINDOW: return handleShowEvent(wnd, wParam);
-    case WM_SIZE:       return handleSizeEvent(wnd, wParam, lParam);
+    case WM_CLOSE:         return handleCloseEvent(wnd);
+    case WM_DESTROY:       return handleDestroyEvent(wnd);
+    case WM_ERASEBKGND:    return TRUE;
+    case WM_KILLFOCUS:     return handleFocusEvent(wnd, false);
+    case WM_MOVE:          return handleMoveEvent(wnd, lParam);
+    case WM_SETFOCUS:      return handleFocusEvent(wnd, true);
+    case WM_SHOWWINDOW:    return handleShowEvent(wnd, wParam);
+    case WM_SIZE:          return handleSizeEvent(wnd, wParam, lParam);
+    case WM_CHANGEUISTATE: return handleChangeUIStateEvent(wnd, hWnd, wParam);
+    case WM_UPDATEUISTATE: {
+      auto len = GetWindowTextLength(hWnd);
+      auto str = std::wstring{};
+          str.resize(len);
+      GetWindowText(hWnd, str.data(), len);
+      std::wcout << str << " received WM_UPDATEUISTATE\n";
+      break;
+    }
     default:            break;
     }
 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
+  }
+
+  LRESULT HEARTHAPI WinAPIEventHandler::handleChangeUIStateEvent(const WinAPIWindow* wnd, HWND hWnd, WPARAM wParam) noexcept {
+    auto len = GetWindowTextLength(hWnd);
+    auto str = std::wstring{};
+        str.resize(len);
+    GetWindowText(hWnd, str.data(), len);
+    std::wcout << str << " received WM_CHANGEUISTATE\n";
+
+    // Send event to children.
+    for (auto child : wnd->mChildren) {
+      auto childHandle = reinterpret_cast<HWND>(child->handle());
+      SendMessage(childHandle, WM_UPDATEUISTATE, wParam, static_cast<LPARAM>(0));
+    }
+
+    return DefWindowProc(hWnd, WM_CHANGEUISTATE, wParam, static_cast<LPARAM>(0));
   }
 
   LRESULT HEARTHAPI WinAPIEventHandler::handleCloseEvent(const WinAPIWindow* wnd) noexcept {

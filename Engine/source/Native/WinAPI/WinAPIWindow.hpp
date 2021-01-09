@@ -67,96 +67,107 @@ namespace Hearth {
 
   public:
     /**
-     * \copydoc IWindow::blur()
+     * \copydoc Window::blur()
      */
     void blur() noexcept override;
 
     /**
-     * \copydoc IWindow::decorate()
+     * \copydoc Window::decorate()
      */
     void decorate() noexcept override;
 
     /**
-     * \copydoc IWindow::flash()
+     * \copydoc Window::flash()
      */
     void flash() noexcept override;
 
     /**
-     * \copydoc IWindow::focus()
+     * \copydoc Window::focus()
      */
     void focus() noexcept override;
 
     /**
-     * \copydoc IWindow::hide()
+     * \copydoc Window::hide()
      */
     void hide() noexcept override;
 
     /**
-     * \copydoc IWindow::maximize()
+     * \copydoc Window::maximize()
      */
     void maximize() noexcept override;
 
     /**
-     * \copydoc IWindow::minimize()
+     * \copydoc Window::minimize()
      */
     void minimize() noexcept override;
 
     /**
-     * \copydoc IWindow::restore()
+     * \copydoc Window::restore()
      */
     void restore() noexcept override;
 
     /**
-     * \copydoc IWindow::show()
+     * \copydoc Window::show()
      */
     void show() noexcept override;
 
     /**
-     * \copydoc IWindow::undecorate()
+     * \copydoc Window::undecorate()
      */
     void undecorate() noexcept override;
 
     /**
-     * \copydoc IWindow::userResizable(bool)
+     * \copydoc Window::userResizable(bool)
      */
     void userResizable(bool userCanResize) noexcept override;
 
     /**
-     * \copydoc IWindow::handle()
+     * \copydoc Window::handle()
      */
     [[nodiscard]]
     WindowHandle handle() const noexcept override;
 
     /**
-     * \copydoc IWindow::position()
+     * \copydoc Window::parent()
+     */
+    [[nodiscard]]
+    Window* parent() const noexcept override;
+
+    /**
+     * \copydoc Window::position()
      */
     [[nodiscard]]
     glm::ivec2 position() const noexcept override;
 
     /**
-     * \copydoc IWindow::size()
+     * \copydoc Window::size()
      */
     [[nodiscard]]
     glm::uvec2 size() const noexcept override;
 
     /**
-     * \copydoc IWindow::title()
+     * \copydoc Window::title()
      */
     [[nodiscard]]
     std::wstring title() const noexcept override;
 
     /**
-     * \copydoc IWindow::reposition(glm::ivec2)
+     * \copydoc Window::reparent(Window*)
+     */
+    void reparent(Window* parent) noexcept override;
+
+    /**
+     * \copydoc Window::reposition(glm::ivec2)
      */
     void reposition(glm::ivec2 pos) noexcept override;
 
     /**
-     * \copydoc IWindow::resize(glm::uvec2)
+     * \copydoc Window::resize(glm::uvec2)
      */
     void resize(glm::uvec2 size) noexcept override;
 
     /**
-     * \copydoc IWindow::retitle(std::wstring_view)
+     * \copydoc Window::retitle(std::wstring_view)
      */
     void retitle(std::wstring_view title) noexcept override;
 

@@ -39,8 +39,10 @@ namespace Hearth {
       .environment = Environment::instance(),
       .wndTitle    = L"Hearth Fire",
       .wndSize     = glm::uvec2{ 1280, 720 },
-      .wndPosition = glm::ivec2{ 640, 360 }
+      .wndPosition = glm::ivec2{ 640, 360 },
+      .visible     = false
     };
+
     mAppWindow = Window::create(&wndCreateInfo);
     mAppWindow->show();
   }

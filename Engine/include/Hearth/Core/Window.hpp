@@ -29,6 +29,7 @@
 #include <cstdint>
 #include <memory>
 #include <string_view>
+#include <vector>
 #include <glm/glm.hpp>
 #include "Environment.hpp"
 #include "Event.hpp"
@@ -87,6 +88,12 @@ namespace Hearth {
        * \details ...
        */
       glm::ivec2 wndPosition;
+
+      /**
+       * \brief   Whether or not the window should be visible on create.
+       * \details ...
+       */
+      bool visible;
     };
 
   public:
@@ -200,6 +207,14 @@ namespace Hearth {
     virtual WindowHandle handle() const noexcept = 0;
 
     /**
+     * \brief
+     * \details
+     * \return Window*
+     */
+    [[nodiscard]]
+    virtual Window* parent() const noexcept = 0;
+
+    /**
      * \brief   Gets the current position of the window in screen coordinates.
      * \details The position of the window is relative to virtual screen space. This value can be
      *          used for other window operations.
@@ -225,6 +240,13 @@ namespace Hearth {
      */
     [[nodiscard]]
     virtual std::wstring title() const noexcept = 0;
+
+    /**
+     * \brief
+     * \details
+     * \param parent
+     */
+    virtual void reparent(Window* parent) noexcept = 0;
 
     /**
      * \brief     Sets the position of this window.
@@ -325,6 +347,19 @@ namespace Hearth {
 
   protected:
     /**
+     * \brief   The children of this window.
+     * \details Stores the children of this window. The parent of a window can be set with the `reparent(Window*)`
+     *          function.
+     */
+    std::vector<const Window*> mChildren;
+
+    /**
+     * \brief   The parent of this window.
+     * \details The last set parent of this window.
+     */
+    Window* mParent;
+
+    /**
      * \brief   Whether or not this window currently has focus.
      * \details The window has focus when it is the top level window, the foreground process, and
      *          can accept input and produce events.
@@ -377,8 +412,15 @@ namespace Hearth {
      */
     bool mVisible : 1 = false;
 
+    /**
+     * \brief   Whether or not the window is being shown for the first time.
+     * \details We must know if the window is being shown for the first time in order to comply with the WinAPI spec.
+     *          The first time we call ShowWindow on native Window for WinAPI, we must use SW_SHOWDEFAULT. All
+     *          subsequent times we can use SW_SHOW.
+     */
+    bool mFirstShow : 1 = true;
   private:
-    char unused : 2 = 0; // This is to pad out the struct.
+    char unused : 1 = 0; // This is to pad out the struct.
   };
 
 }

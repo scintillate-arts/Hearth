@@ -62,6 +62,9 @@ namespace Hearth {
     static LRESULT CALLBACK wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 
   private:
+    /***/
+    static LRESULT HEARTHAPI handleChangeUIStateEvent(const WinAPIWindow* wnd, HWND hWnd, WPARAM wParam) noexcept;
+
     /**
      * \brief 		Handles a call to close a window.
      * \details   ...

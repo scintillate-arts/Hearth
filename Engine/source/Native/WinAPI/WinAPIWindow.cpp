@@ -62,6 +62,10 @@ namespace Hearth {
       throw std::runtime_error(cnv.c_str());
     }
 
+    // Show the window.
+    if (createInfo->visible)
+      show();
+
     // Set Window prop.
     if (FAILED(SetProp(mNativeHandle, kPropName.data(), reinterpret_cast<HANDLE>(this)))) {
       const auto err = WinAPIEnvironment::errorMessage(GetLastError());
@@ -107,6 +111,9 @@ namespace Hearth {
   }
 
   void WinAPIWindow::hide() noexcept {
+    // Window hasn't yet been shown.
+    if (mFirstShow)
+      return;
     ShowWindow(mNativeHandle, SW_HIDE);
   }
 
@@ -123,6 +130,15 @@ namespace Hearth {
   }
 
   void WinAPIWindow::show() noexcept {
+    // Must change the showing.
+    if (mFirstShow) {
+      ShowWindow(mNativeHandle, SW_SHOWDEFAULT);
+      UpdateWindow(mNativeHandle);
+      mFirstShow = false;
+      return;
+    }
+
+    // Proceed to show.
     ShowWindow(mNativeHandle, SW_SHOW);
   }
 
@@ -151,6 +167,11 @@ namespace Hearth {
   }
 
   [[nodiscard]]
+  Window* WinAPIWindow::parent() const noexcept {
+    return mParent;
+  }
+
+  [[nodiscard]]
   glm::ivec2 WinAPIWindow::position() const noexcept {
     RECT rect;
     GetWindowRect(mNativeHandle, &rect);
@@ -174,6 +195,45 @@ namespace Hearth {
     title.resize(static_cast<std::size_t>(len));
     GetWindowText(mNativeHandle, title.data(), len);
     return title;
+  }
+
+  void WinAPIWindow::reparent(Window* parent) noexcept {
+    auto castedParent = dynamic_cast<WinAPIWindow*>(parent);
+    auto parentHandle = reinterpret_cast<HWND>(castedParent->handle());
+    auto oldParent    = SetParent(mNativeHandle, parentHandle);
+
+    // Set WS_CHILD of window.
+    if (parent != nullptr) {
+      LONG_PTR style  = GetWindowLongPtrW(mNativeHandle, GWL_STYLE);
+               style |= WS_CHILD;
+
+      // Must remove this is old parent was desktop.
+      // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setparent#remarks
+      if (oldParent == GetDesktopWindow())
+        style &= ~WS_POPUP;
+      SetWindowLongPtr(mNativeHandle, GWL_STYLE, style);
+    } else {
+      // Must add popup.
+      // See: https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setparent#remarks
+      LONG_PTR style  = GetWindowLongPtrW(mNativeHandle, GWL_STYLE);
+               style &= ~WS_CHILD;
+               style |=  WS_POPUP;
+      SetWindowLongPtr(mNativeHandle, GWL_STYLE, style);
+    }
+
+    // If the parent wasn't the desktop we can remove the child.
+    if (oldParent != GetDesktopWindow()) {
+      auto oldParentWAPIwnd = reinterpret_cast<WinAPIWindow*>(GetProp(oldParent, kPropName.data()));
+      auto childIter        = std::remove(oldParentWAPIwnd->mChildren.begin(), oldParentWAPIwnd->mChildren.end(), static_cast<const Window*>(this));
+      oldParentWAPIwnd->mChildren.erase(childIter);
+    }
+
+    // Set new parent and add child to new parent.
+    mParent = parent;
+    castedParent->mChildren.push_back(static_cast<const Window*>(this));
+
+    // Update window.
+    SendMessageW(parentHandle, WM_CHANGEUISTATE, UIS_INITIALIZE, static_cast<LPARAM>(0));
   }
 
   void WinAPIWindow::reposition(glm::ivec2 pos) noexcept {
