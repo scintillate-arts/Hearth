@@ -3,5 +3,6 @@
   "cmake.configureOnEdit": false,
   "cmake.generator": "MinGW Makefiles",
   "cmake.setBuildTypeOnMultiConfig": true,
-  "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}"
+  "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}",
+  "cmake.configureOnOpen": true
 }
