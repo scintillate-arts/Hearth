@@ -25,6 +25,7 @@
  * \details ...
  */
 #include <iostream>
+#include <Hearth/Core/Monitor.hpp>
 #include <HearthFire/EditorApplication.hpp>
 
 namespace Hearth {
@@ -35,12 +36,21 @@ namespace Hearth {
   }
 
   void EditorApplication::onInitialize() {
+    // Grab primary monitor.
+    const Monitor&   monitor    = Monitor::primary();
+    const glm::uvec2 resolution = monitor.sizeInPixels();
+    const glm::uvec2 wndSize{ 1280, 720 };
+    const glm::ivec2 wndPos{
+      (resolution.x - wndSize.x) / 2,
+      (resolution.y - wndSize.y) / 2
+    };
+
     // Create application window.
     const Window::CreateInfo wndCreateInfo {
       .environment = Environment::instance(),
       .wndTitle    = L"Hearth Fire",
-      .wndSize     = glm::uvec2{ 1280, 720 },
-      .wndPosition = glm::ivec2{ 640, 360 },
+      .wndSize     = wndSize,
+      .wndPosition = wndPos,
       .visible     = false
     };
 
