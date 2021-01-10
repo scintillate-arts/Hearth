@@ -17,12 +17,12 @@ endif()
 
 function(set_project_settings project_name)
 	if(CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
-		set(HEARTH_DEFINITIONS ${HEARTH_DEFINITIONS} HEARTH_DEBUG)
+		set(HEARTH_DEFINITIONS ${HEARTH_DEFINITIONS} HEARTH_DEBUG=1)
 	endif()
 
 	option(HEARTH_ENABLE_PROFILING "Enables library profiling for debugging purposes." OFF)
 	if(HEARTH_ENABLE_PROFILING)
-		set(HEARTH_DEFINITIONS ${HEARTH_DEFINITIONS} HEARTH_PROFILE)
+		set(HEARTH_DEFINITIONS ${HEARTH_DEFINITIONS} HEARTH_PROFILE=1)
 	endif()
 
 	target_compile_definitions(${project_name} INTERFACE ${HEARTH_DEFINITIONS})

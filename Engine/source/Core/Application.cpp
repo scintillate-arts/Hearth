@@ -26,6 +26,7 @@
  */
 #include <iostream>
 #include <Hearth/Core/Application.hpp>
+#include <Hearth/Core/Logger.hpp>
 #include "EventDispatcher.hpp"
 
 namespace Hearth {
@@ -68,9 +69,11 @@ namespace Hearth {
   }
 
   void Application::initialize() {
+    ConsoleLogger::initialize();
     mEnvironment->initialize();
     mEnvironment->trackApplication(this);
     onInitialize(); // Main window should be implemented by extending classes.
+    HEARTH_LOGGER_INFO("{0} Application initialized", mName);
   }
 
   void Application::execute() noexcept {
@@ -94,6 +97,7 @@ namespace Hearth {
     onTerminate();
     mEnvironment->untrackApplciation(this);
     mEnvironment->terminate();
+    HEARTH_LOGGER_INFO("{0} Application terminated", mName);
   }
 
   void Application::onEvent(IEvent *event) {
@@ -101,18 +105,23 @@ namespace Hearth {
     switch (event->type()) {
     case EventType::WindowClose:
       // Call to implementation first.
+      HEARTH_LOGGER_TRACE("{0} Application Received Window close event", mName);
       onWindowClose(dynamic_cast<WindowCloseEvent*>(event));
       break;
     case EventType::WindowFocus:
+      HEARTH_LOGGER_TRACE("{0} Application Received Window focus event", mName);
       onWindowFocus(dynamic_cast<WindowFocusEvent*>(event));
       break;
     case EventType::WindowMove:
+      HEARTH_LOGGER_TRACE("{0} Application Received Window move event", mName);
       onWindowMove(dynamic_cast<WindowMoveEvent*>(event));
       break;
     case EventType::WindowShow:
+      HEARTH_LOGGER_TRACE("{0} Application Received Window show event", mName);
       onWindowShow(dynamic_cast<WindowShowEvent*>(event));
       break;
     case EventType::WindowSize:
+      HEARTH_LOGGER_TRACE("{0} Application Received Window size event", mName);
       onWindowSize(dynamic_cast<WindowSizeEvent*>(event));
       break;
     default:

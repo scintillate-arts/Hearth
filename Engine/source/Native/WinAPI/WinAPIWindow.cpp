@@ -24,6 +24,7 @@
  * \brief   ...
  * \details ...
  */
+#include <Hearth/Core/Logger.hpp>
 #include "WinAPIWindow.hpp"
 #include "WinApiEnvironment.hpp"
 #include <iostream>
@@ -59,8 +60,12 @@ namespace Hearth {
     if (mNativeHandle == nullptr) {
       const auto err = WinAPIEnvironment::errorMessage(GetLastError());
       const auto cnv = std::string(err.begin(), err.end());
+      HEARTH_LOGGER_CRITICAL("Failed to create window: ", cnv);
       throw std::runtime_error(cnv.c_str());
     }
+
+    // Report creation of window.
+    HEARTH_LOGGER_DEBUG("Created application window {0}", static_cast<void*>(mNativeHandle));
 
     // Show the window.
     if (createInfo->visible)
@@ -70,12 +75,22 @@ namespace Hearth {
     if (FAILED(SetProp(mNativeHandle, kPropName.data(), reinterpret_cast<HANDLE>(this)))) {
       const auto err = WinAPIEnvironment::errorMessage(GetLastError());
       const auto cnv = std::string(err.begin(), err.end());
+      HEARTH_LOGGER_CRITICAL(cnv);
       throw std::runtime_error(cnv.c_str());
     }
   }
 
   WinAPIWindow::~WinAPIWindow() noexcept {
-    DestroyWindow(mNativeHandle);
+    // Try to destroy the window.
+    if (!DestroyWindow(mNativeHandle)) {
+      const auto err = WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+      HEARTH_LOGGER_CRITICAL("Failed to destroy window: {0}", cnv);
+      return;
+    }
+
+    // Report happy destruction.
+    HEARTH_LOGGER_DEBUG("Destroyed application window {0}", static_cast<void*>(mNativeHandle));
   }
 
   void WinAPIWindow::blur() noexcept {

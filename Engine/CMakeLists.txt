@@ -37,6 +37,11 @@ target_link_libraries(
 )
 target_include_directories(hearth_engine INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# Add spdlog if we are using debug.
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  target_link_libraries(hearth_engine INTERFACE spdlog)
+endif()
+
 # Build core library.
 file(GLOB_RECURSE CORE_SOURCES false "./Core/" "*.cpp")
 add_library(hearth_core STATIC ${CORE_SOURCES})

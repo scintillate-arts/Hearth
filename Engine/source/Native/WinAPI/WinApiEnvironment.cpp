@@ -26,6 +26,7 @@
  */
 #include <iostream>
 #include <Hearth/Core/Application.hpp>
+#include <Hearth/Core/Logger.hpp>
 #include "WinApiEnvironment.hpp"
 #include "WinApiEventHandler.hpp"
 #if HEARTH_WINDOWS_PLATFORM
@@ -58,17 +59,26 @@ namespace Hearth {
     // Attempt to register window class.
     if (FAILED(RegisterClassEx(&mWindowClass))) {
       std::wstring err(errorMessage(GetLastError()));
+      HEARTH_LOGGER_CRITICAL(std::string(err.begin(), err.end()));
       throwMessageBoxAssertion(err.c_str());
     }
+
+    // Report class registration success.
+    HEARTH_LOGGER_TRACE("Window class registered successfully");
 
     // Set console control handler.
     if (FAILED(SetConsoleCtrlHandler(&consoleControlHandler, TRUE))) {
       std::wstring err(errorMessage(GetLastError()));
+      HEARTH_LOGGER_CRITICAL(std::string(err.begin(), err.end()));
       throwMessageBoxAssertion(err.c_str());
     }
 
+    // Report console handler set success.
+    HEARTH_LOGGER_TRACE("Console control handler set successfully");
+
     // Whew we made it!
     mIsInitialized = true;
+    HEARTH_LOGGER_INFO("WinAPI environment initialized");
   }
 
   void WinAPIEnvironment::terminate() noexcept {
@@ -79,11 +89,16 @@ namespace Hearth {
     // Unregister window class.
     if (FAILED(UnregisterClass(mWindowClass.lpszClassName, mWindowClass.hInstance))) {
       std::wstring err(errorMessage(GetLastError()));
+      HEARTH_LOGGER_CRITICAL(std::string(err.begin(), err.end()));
       throwMessageBoxAssertion(err.c_str());
     }
 
+    // Report unregistation success.
+    HEARTH_LOGGER_TRACE("Window class unregistered successfully");
+
     // Good to go!
     mIsInitialized = false;
+    HEARTH_LOGGER_INFO("WinAPI environment terminated");
   }
 
   void WinAPIEnvironment::pollEvents() const noexcept {
@@ -108,6 +123,7 @@ namespace Hearth {
     // Check if this was a CTRL+C event.
     if (dwCtrlType == CTRL_C_EVENT) {
       // Get the running environment.
+      HEARTH_LOGGER_WARN("Received external shutdown request from user");
       auto env = Environment::instance();
       for (auto app : env->trackedApps())
         app->quit(true);

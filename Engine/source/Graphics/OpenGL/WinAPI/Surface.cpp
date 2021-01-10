@@ -24,8 +24,10 @@
  * \brief
  * \details
  */
+#include <Hearth/Core/Logger.hpp>
 #include "Surface.hpp"
 #if HEARTH_WINDOWS_PLATFORM && HEARTH_GFX_OPENGL_API
+#include "../../../Native/WinAPI/WinApiEnvironment.hpp"
 #include "../../../Native/WinAPI/WinAPIWindow.hpp"
 
 // HACK:
@@ -49,8 +51,16 @@ struct WGLInitializer final {
     );
 
     // Make sure dummy window was created.
-    if (dummyWindow == nullptr)
-      throw std::runtime_error("Failed to create dummy window for WGL initialization.");
+    if (dummyWindow == nullptr) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to create dummy window for WGL initialization:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Grab dummy window and create PFD.
     auto dummyDC = GetDC(dummyWindow);
@@ -68,25 +78,65 @@ struct WGLInitializer final {
 
     // Choose pixel format.
     int pxlFrmt = ChoosePixelFormat(dummyDC, &pfd);
-    if (pxlFrmt == 0)
-      throw std::runtime_error("Failed to find a suitable pixel format for WGL initialization.");
+    if (pxlFrmt == 0) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to find suitable pixel format for WGL initialization:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Set pixel format.
-    if (!SetPixelFormat(dummyDC, pxlFrmt, &pfd))
-      throw std::runtime_error("Failed to set suitable pixel format for WGL initialization.");
+    if (!SetPixelFormat(dummyDC, pxlFrmt, &pfd)) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to set suitable pixel format for WGL initialization:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Create dummy WGL context.
     auto dummyRC = wglCreateContext(dummyDC);
-    if (dummyRC == nullptr)
-      throw std::runtime_error("Failed to create dummy WGL surface render context.");
+    if (dummyRC == nullptr) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to create dummy WGL surface for WGL initialization:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Try to make context current.
-    if (!wglMakeCurrent(dummyDC, dummyRC))
-      throw std::runtime_error("Failed to make dummy WGL surface render context current.");
+    if (!wglMakeCurrent(dummyDC, dummyRC)) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to make dummy WGL surface current for WGL initialization:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Try to initialize WGL.
-    if (wglewInit() != GLEW_OK)
-      throw std::runtime_error("Failed to initialize WGL.");
+    if (wglewInit() != GLEW_OK) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to initialize WGL:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Clean up.
     wglMakeCurrent(dummyDC, NULL);
@@ -94,6 +144,7 @@ struct WGLInitializer final {
     ReleaseDC(dummyWindow, dummyDC);
     DestroyWindow(dummyWindow);
     mInitialized = true;
+    HEARTH_LOGGER_INFO("Successfully initialized WGL");
   }
 
   // Checks if the initializer succeeded.
@@ -109,8 +160,11 @@ namespace Hearth {
 
   WinAPIOpenGLSurface::WinAPIOpenGLSurface(const Window* wnd) {
     // Make sure WGL was initialized.
-    if (!WGLInitializer::didInitialize())
+    if (!WGLInitializer::didInitialize()) {
       WGLInitializer::initialize();
+      HEARTH_LOGGER_WARN("Initializing WGL, expected to be initialized already");
+    } else
+      HEARTH_LOGGER_DEBUG("WGL was initialized as expected");
 
     // Fetch system handle.
     auto hWnd = reinterpret_cast<HWND>(wnd->handle());
@@ -132,6 +186,7 @@ namespace Hearth {
     };
 
     if (wglChoosePixelFormatARB == nullptr) {
+      HEARTH_LOGGER_ERROR("WGL was not initialized properly, wglChoosePixelFormatARB undefined");
       return;
     }
 
@@ -139,14 +194,30 @@ namespace Hearth {
     INT  pixelFormat;
     UINT numFormats;
     wglChoosePixelFormatARB(mDeviceContext, pixelFormatAttribs, NULL, 1, &pixelFormat, &numFormats);
-    if (numFormats == 0)
-      throw std::runtime_error("Failed to find compatible pixel format for render surface.");
+    if (numFormats == 0) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to choose pixel format for WGL surface:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Set pixel format.
     PIXELFORMATDESCRIPTOR pfd;
     DescribePixelFormat(mDeviceContext, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
-    if (!SetPixelFormat(mDeviceContext, pixelFormat, &pfd))
-      throw std::runtime_error("Failed to set compatible pixel format for render surface.");
+    if (!SetPixelFormat(mDeviceContext, pixelFormat, &pfd)) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to choose compatible pixel format for WGL surface:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Specify OpenGL context attributes.
     int glContextAttribs[] = {
@@ -158,16 +229,36 @@ namespace Hearth {
 
     // Try and create context.
     mRenderContext = wglCreateContextAttribsARB(mDeviceContext, NULL, glContextAttribs);
-    if (mRenderContext == nullptr)
-      throw std::runtime_error("Failed to create OpenGL render surface context.");
+    if (mRenderContext == nullptr) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to create WGL render surface context:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
 
     // Try to make render context current.
-    if (!wglMakeCurrent(mDeviceContext, mRenderContext))
-      throw std::runtime_error("Failed to make render surface context current.");
+    if (!wglMakeCurrent(mDeviceContext, mRenderContext)) {
+      // Grab error.
+      const auto err = Hearth::WinAPIEnvironment::errorMessage(GetLastError());
+      const auto cnv = std::string(err.begin(), err.end());
+
+      // Print log in two parts, then throw exception.
+      HEARTH_LOGGER_CRITICAL("Failed to make WGL surface current:");
+      HEARTH_LOGGER_CRITICAL(cnv);
+      throw std::runtime_error(cnv);
+    }
+
+    // Success!
+    HEARTH_LOGGER_DEBUG("Created WGL surface {0}", static_cast<void*>(mRenderContext));
   }
 
   WinAPIOpenGLSurface::~WinAPIOpenGLSurface() noexcept {
     wglDeleteContext(mRenderContext);
+    HEARTH_LOGGER_DEBUG("Destroyed WGL surface {0}", static_cast<void*>(mRenderContext));
   }
 
 }
