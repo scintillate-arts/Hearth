@@ -26,6 +26,7 @@
  */
 #ifndef __HEARTH_NATIVE_WINDOW_HPP__
 #define __HEARTH_NATIVE_WINDOW_HPP__ 1
+#include <Hearth/Config.hpp>
 #include <Hearth/Core/Window.hpp>
 
 /* Windows specific */
@@ -40,142 +41,40 @@ namespace Hearth {
    * \brief 	A WinAPI implementation of the window interface.
    * \details ...
    */
-  class WinAPIWindow : public Window {
+  class WinAPIWindow : public Core::Window {
     // Can access the protected members to set them.
     friend class WinAPIEventHandler;
 
   public:
-    /**
-     * \brief 	The name of window properties used by Hearth.
-     * \details ...
-     */
     static constexpr std::wstring_view kPropName = L"Hearth::Window::Prop";
 
   public:
-    /**
-     * \brief 		Constructs a new WinAPI window instance from the given create information.
-     * \details 	...
-     * \param[in] createInfo The information needed to create the window.
-     */
-    explicit WinAPIWindow(const Window::CreateInfo* createInfo);
-
-    /**
-     * \brief 	Makes sure the native window is destroyed properly.
-     * \details ...
-     */
+    explicit WinAPIWindow(const Core::Window::CreateInfo* createInfo);
     ~WinAPIWindow() noexcept override;
 
   public:
-    /**
-     * \copydoc Window::blur()
-     */
     void blur() noexcept override;
-
-    /**
-     * \copydoc Window::decorate()
-     */
     void decorate() noexcept override;
-
-    /**
-     * \copydoc Window::flash()
-     */
     void flash() noexcept override;
-
-    /**
-     * \copydoc Window::focus()
-     */
     void focus() noexcept override;
-
-    /**
-     * \copydoc Window::hide()
-     */
     void hide() noexcept override;
-
-    /**
-     * \copydoc Window::maximize()
-     */
     void maximize() noexcept override;
-
-    /**
-     * \copydoc Window::minimize()
-     */
     void minimize() noexcept override;
-
-    /**
-     * \copydoc Window::restore()
-     */
     void restore() noexcept override;
-
-    /**
-     * \copydoc Window::show()
-     */
     void show() noexcept override;
-
-    /**
-     * \copydoc Window::undecorate()
-     */
     void undecorate() noexcept override;
-
-    /**
-     * \copydoc Window::userResizable(bool)
-     */
     void userResizable(bool userCanResize) noexcept override;
-
-    /**
-     * \copydoc Window::handle()
-     */
-    [[nodiscard]]
-    WindowHandle handle() const noexcept override;
-
-    /**
-     * \copydoc Window::parent()
-     */
-    [[nodiscard]]
-    Window* parent() const noexcept override;
-
-    /**
-     * \copydoc Window::position()
-     */
-    [[nodiscard]]
+    Core::WindowHandle systemHandle() const noexcept override;
+    Core::Window* parent() const noexcept override;
     glm::ivec2 position() const noexcept override;
-
-    /**
-     * \copydoc Window::size()
-     */
-    [[nodiscard]]
     glm::uvec2 size() const noexcept override;
-
-    /**
-     * \copydoc Window::title()
-     */
-    [[nodiscard]]
     std::wstring title() const noexcept override;
-
-    /**
-     * \copydoc Window::reparent(Window*)
-     */
-    void reparent(Window* parent) noexcept override;
-
-    /**
-     * \copydoc Window::reposition(glm::ivec2)
-     */
+    void reparent(Core::Window* parent) noexcept override;
     void reposition(glm::ivec2 pos) noexcept override;
-
-    /**
-     * \copydoc Window::resize(glm::uvec2)
-     */
     void resize(glm::uvec2 size) noexcept override;
-
-    /**
-     * \copydoc Window::retitle(std::wstring_view)
-     */
     void retitle(std::wstring_view title) noexcept override;
 
   protected:
-    /**
-     * \brief 	The native window handle.
-     * \details ...
-     */
     HWND mNativeHandle;
   };
 

@@ -6,7 +6,7 @@ target_include_directories(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(HearthFire PRIVATE hearth)
+target_link_libraries(HearthFire PRIVATE Hearth::Engine)
 
 # Build benchmarks
 

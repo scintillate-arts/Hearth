@@ -38,7 +38,7 @@ namespace Hearth {
    * \brief 	A window's specific implementation of the Environment.
    * \details ...
    */
-  class WinAPIEnvironment : public Environment {
+  class WinAPIEnvironment : public Core::Environment {
   public:
     /**
      * \copydoc Environment::initialize()
@@ -59,8 +59,7 @@ namespace Hearth {
      * \copydoc Environment::platform()
      * \returns The correct platform, in this case Platform::Windows.
      */
-    [[nodiscard]]
-    Platform platform() const noexcept override;
+    Core::Platform platform() const noexcept override;
 
   public:
     /**
@@ -68,8 +67,7 @@ namespace Hearth {
      * \details ...
      * \returns The window class that was created with this environment.
      */
-    [[nodiscard]]
-    const WNDCLASSEX& windowClass() const noexcept;
+    const WNDCLASSEXW& windowClass() const noexcept;
 
   public:
     /**
@@ -122,7 +120,7 @@ namespace Hearth {
      * \brief 	The window class for the environment.
      * \details ...
      */
-    WNDCLASSEX mWindowClass;
+    WNDCLASSEXW mWindowClass;
   };
 
 }

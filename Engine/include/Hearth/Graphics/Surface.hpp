@@ -27,12 +27,10 @@
 #ifndef __HEARTH_GFX_SURFACE_HPP__
 #define __HEARTH_GFX_SURFACE_HPP__ 1
 #include "../Config.hpp"
+#include "../Core/Forward.hpp"
 #if HEARTH_GFX_OPENGL_API
 
 namespace Hearth {
-
-  // Forward.
-  struct Window;
 
   /**
    * \brief   Represents a rendering surface for the graphics APIs.

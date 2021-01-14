@@ -19,11 +19,6 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * \file    Window.cpp
- * \brief   ...
- * \details ...
- */
 #include <Hearth/Core/Logger.hpp>
 #include "WinAPIWindow.hpp"
 #include "WinApiEnvironment.hpp"
@@ -31,7 +26,7 @@
 
 namespace Hearth {
 
-  WinAPIWindow::WinAPIWindow(const Window::CreateInfo *createInfo) {
+  WinAPIWindow::WinAPIWindow(const Core::Window::CreateInfo *createInfo) {
     // Get environment.
     auto winEnv = dynamic_cast<const WinAPIEnvironment*>(createInfo->environment.get());
     auto wndCls = winEnv->windowClass();
@@ -41,7 +36,7 @@ namespace Hearth {
     const LONG_PTR nmstyle = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_OVERLAPPEDWINDOW;
 
     // Prepare window for creation.
-    mNativeHandle = CreateWindowEx(
+    mNativeHandle = CreateWindowExW(
       exstyle,
       kClassName.data(),
       createInfo->wndTitle.data(),
@@ -72,7 +67,7 @@ namespace Hearth {
       show();
 
     // Set Window prop.
-    if (FAILED(SetProp(mNativeHandle, kPropName.data(), reinterpret_cast<HANDLE>(this)))) {
+    if (FAILED(SetPropW(mNativeHandle, kPropName.data(), reinterpret_cast<HANDLE>(this)))) {
       const auto err = WinAPIEnvironment::errorMessage(GetLastError());
       const auto cnv = std::string(err.begin(), err.end());
       HEARTH_LOGGER_CRITICAL(cnv);
@@ -176,24 +171,20 @@ namespace Hearth {
       undecorate();
   }
 
-  [[nodiscard]]
-  WindowHandle WinAPIWindow::handle() const noexcept {
-    return reinterpret_cast<WindowHandle>(mNativeHandle);
+  Core::WindowHandle WinAPIWindow::systemHandle() const noexcept {
+    return reinterpret_cast<Core::WindowHandle>(mNativeHandle);
   }
 
-  [[nodiscard]]
-  Window* WinAPIWindow::parent() const noexcept {
+  Core::Window* WinAPIWindow::parent() const noexcept {
     return mParent;
   }
 
-  [[nodiscard]]
   glm::ivec2 WinAPIWindow::position() const noexcept {
     RECT rect;
     GetWindowRect(mNativeHandle, &rect);
     return glm::ivec2 { rect.left, rect.top };
   }
 
-  [[nodiscard]]
   glm::uvec2 WinAPIWindow::size() const noexcept {
     RECT rect;
     GetWindowRect(mNativeHandle, &rect);
@@ -203,18 +194,17 @@ namespace Hearth {
     };
   }
 
-  [[nodiscard]]
   std::wstring WinAPIWindow::title() const noexcept {
     std::wstring title;
     const auto len = GetWindowTextLength(mNativeHandle);
     title.resize(static_cast<std::size_t>(len));
-    GetWindowText(mNativeHandle, title.data(), len);
+    GetWindowTextW(mNativeHandle, title.data(), len);
     return title;
   }
 
-  void WinAPIWindow::reparent(Window* parent) noexcept {
+  void WinAPIWindow::reparent(Core::Window* parent) noexcept {
     auto castedParent = dynamic_cast<WinAPIWindow*>(parent);
-    auto parentHandle = reinterpret_cast<HWND>(castedParent->handle());
+    auto parentHandle = reinterpret_cast<HWND>(castedParent->systemHandle());
     auto oldParent    = SetParent(mNativeHandle, parentHandle);
 
     // Set WS_CHILD of window.
@@ -238,14 +228,14 @@ namespace Hearth {
 
     // If the parent wasn't the desktop we can remove the child.
     if (oldParent != GetDesktopWindow()) {
-      auto oldParentWAPIwnd = reinterpret_cast<WinAPIWindow*>(GetProp(oldParent, kPropName.data()));
-      auto childIter        = std::remove(oldParentWAPIwnd->mChildren.begin(), oldParentWAPIwnd->mChildren.end(), static_cast<const Window*>(this));
+      auto oldParentWAPIwnd = reinterpret_cast<WinAPIWindow*>(GetPropW(oldParent, kPropName.data()));
+      auto childIter        = std::remove(oldParentWAPIwnd->mChildren.begin(), oldParentWAPIwnd->mChildren.end(), Core::WindowView{ this });
       oldParentWAPIwnd->mChildren.erase(childIter);
     }
 
     // Set new parent and add child to new parent.
     mParent = parent;
-    castedParent->mChildren.push_back(static_cast<const Window*>(this));
+    castedParent->mChildren.push_back(Core::WindowView{ this });
 
     // Update window.
     SendMessageW(parentHandle, WM_CHANGEUISTATE, UIS_INITIALIZE, static_cast<LPARAM>(0));
@@ -298,10 +288,10 @@ namespace Hearth {
   }
 
   void WinAPIWindow::retitle(std::wstring_view title) noexcept {
-    SetWindowText(mNativeHandle, title.data());
+    SetWindowTextW(mNativeHandle, title.data());
   }
 
-  Window* Window::create(const Window::CreateInfo* createInfo) noexcept {
+  Core::Window* Core::Window::create(const Core::Window::CreateInfo* createInfo) noexcept {
     Window* result = nullptr;
     try {
       result = new WinAPIWindow(createInfo);
@@ -311,7 +301,7 @@ namespace Hearth {
     return result;
   }
 
-  void Window::destroy(Window* window) noexcept {
+  void Core::Window::destroy(Core::Window* window) noexcept {
     try {
       delete dynamic_cast<WinAPIWindow*>(window);
     } catch (const std::runtime_error& err) {

@@ -19,17 +19,12 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * \file
- * \brief
- * \details
- */
 #include <Hearth/Config.hpp>
 #include <Hearth/Core/Monitor.hpp>
 #if HEARTH_WINDOWS_PLATFORM
 #include "WinAPI.hpp"
 
-namespace Hearth {
+namespace Hearth::Core {
 
   // The available monitors on the platform.
   static std::vector<Monitor> sPlatformConnectedMonitors;
@@ -84,17 +79,17 @@ namespace Hearth {
         splitbpp(displayMode.dmBitsPerPel, vidMode.redBits, vidMode.greenBits, vidMode.blueBits);
 
         // See if the video mode is already contained.
-        auto itr = std::find(monitor.mAvailableModes.begin(), monitor.mAvailableModes.end(), vidMode);
-        if (itr != monitor.mAvailableModes.end())
+        auto itr = std::find(monitor.m_availableModes.begin(), monitor.m_availableModes.end(), vidMode);
+        if (itr != monitor.m_availableModes.end())
           continue;
 
         // Make sure this mode can actually be used.
         if (pruned) {
-          if (ChangeDisplaySettingsExW(monitor.mDeviceName.c_str(), &displayMode, nullptr, CDS_TEST, 0) != DISP_CHANGE_SUCCESSFUL)
+          if (ChangeDisplaySettingsExW(monitor.m_deviceName.c_str(), &displayMode, nullptr, CDS_TEST, 0) != DISP_CHANGE_SUCCESSFUL)
             continue;
         }
 
-        monitor.mAvailableModes.emplace_back(vidMode);
+        monitor.m_availableModes.emplace_back(vidMode);
       }
     }
 
@@ -113,9 +108,9 @@ namespace Hearth {
 
         // Create new monitor.
         Monitor monitor;
-                monitor.mDeviceName  = adapter.DeviceName;
-                monitor.mAdapterName = adapter.DeviceString;
-                monitor.mMonitorName = displayInfo.DeviceString;
+                monitor.m_deviceName  = adapter.DeviceName;
+                monitor.m_adapterName = adapter.DeviceString;
+                monitor.m_monitorName = displayInfo.DeviceString;
 
         // This device context will help us get device capabilities.
         // When we specify the driver and device name this way, it will actually give us a device
@@ -125,12 +120,12 @@ namespace Hearth {
 
         // Get monitor settings.
         EnumDisplaySettingsExW(adapter.DeviceName, ENUM_CURRENT_SETTINGS, &displaySettings, EDS_ROTATEDMODE);
-        monitor.mSizeInPixels   = glm::uvec2{ displaySettings.dmPelsWidth,  displaySettings.dmPelsHeight };
-        monitor.mScreenPosition = glm::ivec2{ displaySettings.dmPosition.x, displaySettings.dmPosition.y };
+        monitor.m_sizeInPixels   = glm::uvec2{ displaySettings.dmPelsWidth,  displaySettings.dmPelsHeight };
+        monitor.m_screenPosition = glm::ivec2{ displaySettings.dmPosition.x, displaySettings.dmPosition.y };
         if (IsWindows8Point1OrGreater())
-          monitor.mSizeInMillimeters = glm::uvec2{ GetDeviceCaps(dc, HORZSIZE), GetDeviceCaps(dc, VERTSIZE) };
+          monitor.m_sizeInMillimeters = glm::uvec2{ GetDeviceCaps(dc, HORZSIZE), GetDeviceCaps(dc, VERTSIZE) };
         else
-          monitor.mSizeInMillimeters = glm::uvec2{
+          monitor.m_sizeInMillimeters = glm::uvec2{
             displaySettings.dmPelsWidth  * 25.4f / GetDeviceCaps(dc, LOGPIXELSX),
             displaySettings.dmPelsHeight * 25.4f / GetDeviceCaps(dc, LOGPIXELSY)
           };
@@ -190,36 +185,36 @@ namespace Hearth {
     return this == &sPlatformConnectedMonitors[0];
   }
 
-  std::wstring_view Monitor::deviceName() const noexcept {
-    return mDeviceName;
+  WideStringView Monitor::deviceName() const noexcept {
+    return m_deviceName;
   }
 
-  std::wstring_view Monitor::adapterName() const noexcept {
-    return mAdapterName;
+  WideStringView Monitor::adapterName() const noexcept {
+    return m_adapterName;
   }
 
-  std::wstring_view Monitor::name() const noexcept {
-    return mMonitorName;
+  WideStringView Monitor::name() const noexcept {
+    return m_monitorName;
   }
 
   glm::uvec2 Monitor::sizeInMillimeters() const noexcept {
-    return mSizeInMillimeters;
+    return m_sizeInMillimeters;
   }
 
   glm::uvec2 Monitor::sizeInPixels() const noexcept {
-    return mSizeInPixels;
+    return m_sizeInPixels;
   }
 
   glm::ivec2 Monitor::screenPosition() const noexcept {
-    return mScreenPosition;
+    return m_screenPosition;
   }
 
   const VideoMode& Monitor::videoMode() const noexcept {
-    return *mCurrentMode;
+    return *m_currentMode;
   }
 
   const std::vector<VideoMode>& Monitor::availableModes() const noexcept {
-    return mAvailableModes;
+    return m_availableModes;
   }
 
 }

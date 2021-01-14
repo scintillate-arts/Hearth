@@ -53,7 +53,7 @@ namespace Hearth {
     /**
      * \copydoc RenderContext::createSurface(const Window*)
      */
-    Surface* createSurface(const Window* wnd) noexcept override;
+    Surface* createSurface(const Core::Window* wnd) noexcept override;
 
     /**
      * \copydoc RenderContext::destroySurface(Surface*)

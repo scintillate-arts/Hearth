@@ -31,20 +31,20 @@
 #include <vector>
 #include <Hearth/Core/Event.hpp>
 
-namespace Hearth {
+namespace Hearth::Core {
 
   /**
    * \brief		Represents an interface by which an event emitter can send an event to be handled.
    * \details ...
    */
-  class IEventHandler {
+  class EventHandler {
   protected:
     /**
      * \brief			Constructs an event handler with the given priority.
      * \details 	...
      * \param[in] priority The priority for the event handler.
      */
-    explicit IEventHandler(std::uint32_t priority) noexcept
+    explicit EventHandler(std::uint32_t priority) noexcept
       : mPriority{ priority }
     { }
 
@@ -53,14 +53,14 @@ namespace Hearth {
      * \brief		Default destructor.
      * \details ...
      */
-    virtual ~IEventHandler() noexcept = default;
+    virtual ~EventHandler() noexcept = default;
 
     /**
      * \brief			Called by an event emitter which can pass a given event to the handler.
      * \details ...
      * \param[in] event A pointer to the event to handle.
      */
-    virtual void notify(IEvent* event) const noexcept = 0;
+    virtual void notify(Event* event) const noexcept = 0;
 
   public:
     /**
@@ -85,13 +85,13 @@ namespace Hearth {
    * \details ...
    */
   template<class T>
-  class MemberFunctionEventHandler final : public IEventHandler {
+  class MemberFunctionEventHandler final : public EventHandler {
   public:
     /**
      * \brief 	The type of callback this event handler uses.
      * \details ...
      */
-    using CallbackType = void (T::*)(IEvent*);
+    using CallbackType = void (T::*)(Event*);
 
   public:
     /**
@@ -102,7 +102,7 @@ namespace Hearth {
      * \param[in] priority The priority of the event handler over other handlers.
      */
     explicit MemberFunctionEventHandler(T* callee, CallbackType callback, uint32_t priority) noexcept
-      : IEventHandler(priority)
+      : EventHandler(priority)
       , mCallee(callee)
       , mCallback(callback)
     { }
@@ -123,7 +123,7 @@ namespace Hearth {
      * \details 	...
      * \param[in] event The event to be handled.
      */
-    void notify(IEvent* event) const noexcept final {
+    void notify(Event* event) const noexcept final {
       (mCallee->*mCallback)(event);
     }
 
@@ -138,7 +138,7 @@ namespace Hearth {
      * \brief 	The callback to execute during notification.
      * \details ...
      */
-    CallbackType  mCallback;
+    CallbackType mCallback;
   };
 
   /**
@@ -150,13 +150,13 @@ namespace Hearth {
      * \brief 	A type definition for event handler instances.
      * \details ...
      */
-    using EventHandler = std::unique_ptr<IEventHandler>;
+    using EventHandler = std::unique_ptr<EventHandler>;
 
     /**
      * \brief 	A type definition for event instance.
      * \details ...
      */
-    using Event = std::unique_ptr<IEvent>;
+    using Event = std::unique_ptr<Event>;
 
     /**
      * \brief 	A type definition for a member function callback.
@@ -245,7 +245,7 @@ namespace Hearth {
     static void unregisterHandler(T* callee, MemberFunctionCallback<T> callback, std::uint32_t priority) noexcept {
       MemberFunctionEventHandler<T> toRemove(callee, callback, priority);
       for (auto itr = mHandlers.begin(); itr != mHandlers.end(); ) {
-        // Lets make this really simple, we're just casting the IEventHandler* to
+        // Lets make this really simple, we're just casting the EventHandler* to
         // MemberFunctionEventHandler* and then dereferencing that so we can compare it
         // to 'toRemove'.
         auto val = *dynamic_cast<MemberFunctionEventHandler<T>*>(itr->get());

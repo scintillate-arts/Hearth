@@ -40,7 +40,7 @@ namespace Hearth {
      * \details   ...
      * \param[in] wnd The window to create the surface from.
      */
-    explicit WinAPIOpenGLSurface(const Window* wnd);
+    explicit WinAPIOpenGLSurface(const Core::Window* wnd);
 
     /**
      * \brief   Default destructor for \c WinAPIOpenGLSurface objects.

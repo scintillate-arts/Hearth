@@ -25,17 +25,18 @@
  * \details ...
  */
 #include <iostream>
+#include <Hearth/Core/Environment.hpp>
 #include <Hearth/Core/Monitor.hpp>
 #include <HearthFire/EditorApplication.hpp>
 
-namespace Hearth {
+namespace Hearth::Editor {
 
-  EditorApplication::EditorApplication()
-    : Application(&kEditorCreateInfo)
+  Application::Application()
+    : Core::Application(&kEditorCreateInfo)
   {
   }
 
-  void EditorApplication::onInitialize() {
+  void Application::onInitialize() {
     // Grab primary monitor.
     const Monitor&   monitor    = Monitor::primary();
     const glm::uvec2 resolution = monitor.sizeInPixels();
@@ -47,36 +48,23 @@ namespace Hearth {
 
     // Create application window.
     const Window::CreateInfo wndCreateInfo {
-      .environment = Environment::instance(),
+      .environment = Environment::instanceView(),
       .wndTitle    = L"Hearth Fire",
       .wndSize     = wndSize,
       .wndPosition = wndPos,
       .visible     = false
     };
 
-    mAppWindow = Window::create(&wndCreateInfo);
-    mAppWindow->show();
-
-    // Create render context.
-    const RenderContext::CreateInfo rdrctxCreateInfo {
-      .app          = this,
-      .requestedAPI = GraphicsAPI::OpenGL
-    };
-
-    mRenderContext = RenderContext::create(&rdrctxCreateInfo);
-
-    // Create render surface.
-    mRenderSurface = mRenderContext->createSurface(mAppWindow);
+    m_appWindow = Window::create(&wndCreateInfo);
+    m_appWindow->show();
   }
 
-  void EditorApplication::onTerminate() noexcept {
-    mRenderContext->destroySurface(mRenderSurface);
-    RenderContext::destroy(mRenderContext);
-    Window::destroy(mAppWindow);
+  void Application::onTerminate() noexcept {
+    Window::destroy(m_appWindow);
   }
 
-  void EditorApplication::onWindowClose(WindowCloseEvent* wce) noexcept {
-    if (wce->window() != mAppWindow)
+  void Application::onWindowClose(Window::CloseEvent* wce) noexcept {
+    if (wce->window() != m_appWindow)
       return;
     quit(true);
     wce->consume();

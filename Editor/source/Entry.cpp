@@ -28,7 +28,7 @@
 #include <HearthFire/EditorApplication.hpp>
 
 int main(int, char**) {
-  Hearth::EditorApplication editorApp;
+  Hearth::Editor::Application editorApp;
   editorApp.run();
   return 0;
 }

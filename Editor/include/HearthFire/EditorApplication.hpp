@@ -30,8 +30,9 @@
 #include <Hearth/Core/Window.hpp>
 #include <Hearth/Graphics/RenderContext.hpp>
 #include <Hearth/Graphics/Surface.hpp>
+using namespace Hearth::Core;
 
-namespace Hearth {
+namespace Hearth::Editor {
   /**
    * \brief		The information needed to create the editor application.
    * \details ...
@@ -46,48 +47,21 @@ namespace Hearth {
    * \brief		Represents the Hearth Engine editor application.
    * \details ...
    */
-  class EditorApplication : public Application {
+  class Application : public Core::Application {
   public:
     /**
      * \brief		Constructs a new editor application.
      * \details ...
      */
-    EditorApplication();
+    Application();
 
   protected:
-    /**
-     * \copydoc Application::onInitialize()
-     */
     void onInitialize() override;
-
-    /**
-     * \copydoc Application::onTerminate()
-     */
     void onTerminate() noexcept override;
-
-    /**
-     * \copydoc Application::onWindowClose(WindowCloseEvent*)
-     */
-    void onWindowClose(WindowCloseEvent* wce) noexcept override;
+    void onWindowClose(Window::CloseEvent* wce) noexcept override;
 
   private:
-    /**
-     * \brief 	The application window.
-     * \details ...
-     */
-    Window* mAppWindow;
-
-    /**
-     * \brief   The render context for the application.
-     * \details ...
-     */
-    RenderContext* mRenderContext;
-
-    /**
-     * \brief   The surface the application will render to.
-     * \details ...
-     */
-    Surface* mRenderSurface;
+    Window* m_appWindow;
   };
 
 }

@@ -19,6 +19,9 @@ FetchContent_Declare(
 )
 message(STATUS "Fetch complete")
 
+# We need Vulkan, so find it
+find_package(Vulkan REQUIRED)
+
 # Make tools available.
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 set(ONLY_LIBS ON CACHE BOOL "" FORCE)
@@ -26,54 +29,62 @@ FetchContent_MakeAvailable(glm glew)
 message(STATUS "GLM and GLEW made available")
 
 # Build primary library.
-add_library(hearth_engine INTERFACE)
-target_compile_definitions(hearth_engine INTERFACE UNICODE INTERFACE GLEW_STATIC)
+add_library(HearthLibs INTERFACE)
+target_compile_definitions(HearthLibs INTERFACE GLEW_STATIC)
+target_include_directories(HearthLibs INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(
-  hearth_engine
+  HearthLibs
   INTERFACE hearth_project_settings
   INTERFACE glm::glm
-  INTERFACE libglew_static
-  INTERFACE opengl32
+  INTERFACE spdlog
 )
-target_include_directories(hearth_engine INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-# Add spdlog if we are using debug.
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-  target_link_libraries(hearth_engine INTERFACE spdlog)
-endif()
 
 # Build core library.
-file(GLOB_RECURSE CORE_SOURCES false "./Core/" "*.cpp")
-add_library(hearth_core STATIC ${CORE_SOURCES})
-add_library(hearth::core ALIAS hearth_core)
-target_link_libraries(hearth_core PUBLIC hearth_engine)
+file(GLOB HEARTH_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/Core/*.cpp)
+add_library(HearthCore STATIC ${HEARTH_CORE_SOURCES})
+add_library(Hearth::Core ALIAS HearthCore)
+target_link_libraries(HearthCore PUBLIC HearthLibs)
 
 # Create Native interface.
-add_library(hearth_native INTERFACE)
-add_library(hearth::native ALIAS hearth_native)
+add_library(HearthNative INTERFACE)
+add_library(Hearth::Native ALIAS HearthNative)
 
 # Build WinAPI library.
 if(WIN32)
-  file(GLOB_RECURSE NATIVE_WINAPI_SOURCES false "./Native/WinAPI/" "*.cpp")
-  add_library(hearth_winapi STATIC ${NATIVE_WINAPI_SOURCES})
-  add_library(hearth::winapi ALIAS hearth_winapi)
-  target_link_libraries(hearth_winapi PUBLIC hearth_engine)
-  target_link_libraries(hearth_native INTERFACE hearth_winapi)
+  file(GLOB HEARTH_WINAPI_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/Native/WinAPI/*.cpp)
+  add_library(HearthWinAPI STATIC ${HEARTH_WINAPI_SOURCES})
+  add_library(Hearth::WinAPI ALIAS HearthWinAPI)
+  target_link_libraries(HearthWinAPI PUBLIC HearthLibs PUBLIC HearthCore)
+  target_link_libraries(HearthNative INTERFACE HearthWinAPI)
 endif()
 
+# OpenGL graphics
+file(GLOB_RECURSE HEARTH_OPENGL_SOURCES TRUE ${CMAKE_CURRENT_SOURCE_DIR}/source/Graphics/OpenGL/*.cpp)
+add_library(HearthOpenGL STATIC ${HEARTH_OPENGL_SOURCES})
+add_library(Hearth::OpenGL ALIAS HearthOpenGL)
+target_link_libraries(HearthOpenGL PUBLIC HearthLibs PUBLIC libglew_static PUBLIC opengl32)
+
 # Full graphics library.
-file(GLOB_RECURSE GFX_SOURCES false "./Graphics/" "*.cpp")
-add_library(hearth_graphics STATIC ${GFX_SOURCES})
-add_library(hearth::graphics ALIAS hearth_graphics)
-target_link_libraries(hearth_graphics PUBLIC hearth_engine)
+file(GLOB HEARTH_GRAPHICS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/Graphics/*.cpp)
+add_library(HearthGraphics STATIC ${HEARTH_GRAPHICS_SOURCES})
+add_library(Hearth::Graphics ALIAS HearthGraphics)
+target_link_libraries(HearthGraphics PUBLIC HearthOpenGL)
+
+# Hearth proper
+file(GLOB HEARTH_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+add_library(HearthProper STATIC ${HEARTH_SOURCES})
+add_library(Hearth::Proper ALIAS HearthProper)
+target_link_libraries(HearthProper PUBLIC HearthLibs)
 
 # Build all in one target.
-add_library(hearth INTERFACE)
+add_library(HearthEngine INTERFACE)
+add_library(Hearth::Engine ALIAS HearthEngine)
 target_link_libraries(
-  hearth
-  INTERFACE hearth::core
-  INTERFACE hearth::native
-  INTERFACE hearth::graphics
+  HearthEngine
+  INTERFACE HearthProper
+  INTERFACE HearthCore
+  INTERFACE HearthNative
+  INTERFACE HearthGraphics
 )
 
 # Build benchmarks.

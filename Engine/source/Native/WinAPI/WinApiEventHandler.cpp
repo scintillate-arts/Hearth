@@ -70,7 +70,7 @@ namespace Hearth {
   LRESULT HEARTHAPI WinAPIEventHandler::handleChangeUIStateEvent(const WinAPIWindow* wnd, HWND hWnd, WPARAM wParam) noexcept {
     // Send event to children.
     for (auto child : wnd->mChildren) {
-      auto childHandle = reinterpret_cast<HWND>(child->handle());
+      auto childHandle = reinterpret_cast<HWND>(child->systemHandle());
       SendMessage(childHandle, WM_UPDATEUISTATE, wParam, static_cast<LPARAM>(0));
     }
 
@@ -79,7 +79,7 @@ namespace Hearth {
 
   LRESULT HEARTHAPI WinAPIEventHandler::handleCloseEvent(const WinAPIWindow* wnd) noexcept {
     // Push event.
-    EventDispatcher::pushEvent(std::make_unique<WindowCloseEvent>(wnd));
+    Core::EventDispatcher::pushEvent(std::make_unique<Core::Window::CloseEvent>(wnd));
     return FALSE;
   }
 
@@ -88,14 +88,14 @@ namespace Hearth {
   }
 
   LRESULT WinAPIEventHandler::handleFocusEvent(WinAPIWindow *wnd, bool focused) noexcept {
-    EventDispatcher::pushEvent(std::make_unique<WindowFocusEvent>(wnd, focused));
+    Core::EventDispatcher::pushEvent(std::make_unique<Core::Window::FocusEvent>(wnd, focused));
     wnd->mFocused = focused;
     return FALSE;
   }
 
   LRESULT WinAPIEventHandler::handleMoveEvent(WinAPIWindow *wnd, LPARAM lParam) noexcept {
     const glm::ivec2 position{ static_cast<int>(LOWORD(lParam)), static_cast<int>(HIWORD(lParam)) };
-    EventDispatcher::pushEvent(std::make_unique<WindowMoveEvent>(wnd, position));
+    Core::EventDispatcher::pushEvent(std::make_unique<Core::Window::MoveEvent>(wnd, position));
     return FALSE;
   }
 
@@ -106,11 +106,11 @@ namespace Hearth {
     const auto width     = static_cast<glm::u32>(LOWORD(lParam));
     const auto height    = static_cast<glm::u32>(HIWORD(lParam));
     const auto size      = glm::uvec2{ width, height };
-    const auto state     = minimized ? SizeState::Minimized :
-                           maximized ? SizeState::Maximized :
-                                       SizeState::Restored;
+    const auto state     = minimized ? Core::SizeState::Minimized :
+                           maximized ? Core::SizeState::Maximized :
+                                       Core::SizeState::Restored;
     // Emit event.
-    EventDispatcher::pushEvent(std::make_unique<WindowSizeEvent>(wnd, size, state));
+    Core::EventDispatcher::pushEvent(std::make_unique<Core::Window::SizeEvent>(wnd, size, state));
     wnd->mMaximized = maximized;
     wnd->mMinimized = minimized;
     return FALSE;
@@ -120,11 +120,11 @@ namespace Hearth {
     // Check if state changed.
     if (wParam == TRUE && wnd->mVisible != TRUE) {
       // emit.
-      EventDispatcher::pushEvent(std::make_unique<WindowShowEvent>(wnd, true));
+      Core::EventDispatcher::pushEvent(std::make_unique<Core::Window::ShowEvent>(wnd, true));
       wnd->mVisible = true;
     } else if (wParam == FALSE && wnd->mVisible != FALSE) {
       // emit.
-      EventDispatcher::pushEvent(std::make_unique<WindowShowEvent>(wnd, false));
+      Core::EventDispatcher::pushEvent(std::make_unique<Core::Window::ShowEvent>(wnd, false));
       wnd->mVisible = false;
     }
 

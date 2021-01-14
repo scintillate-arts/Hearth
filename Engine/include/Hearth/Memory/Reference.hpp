@@ -19,71 +19,62 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * \file
- * \brief
- * \details
- */
-#include <Hearth/Core/Logger.hpp>
-#include <spdlog/sinks/stdout_sinks.h>
+#ifndef __INC_HEARTH_MEMORY_REFERENCE_HPP__
+#define __INC_HEARTH_MEMORY_REFERENCE_HPP__ 1
 
-namespace Hearth::Core {
+namespace Hearth::Memory {
 
-  void ConsoleLogger::initialize() {
-  #if HEARTH_DEBUG
-    spdlog::set_pattern("%^[%T] %n: %v%$");
-    m_logger = spdlog::stdout_color_mt("HearthEngine");
-    m_logger->set_level(spdlog::level::trace);
-    m_logger->info("Console Logger Initialized");
-  #endif
-  }
+  template<typename TType>
+  class Reference final {
+    public:
+    constexpr Reference() noexcept
+      : m_mutableData(nullptr)
+    { }
 
-  void ConsoleLogger::printTrace(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->trace(log);
-  #endif
-  }
+    constexpr
+    explicit Reference(TType& data) noexcept
+      : m_mutableData(&data)
+    { }
 
-  void ConsoleLogger::printDebug(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->debug(log);
-  #endif
-  }
+    constexpr
+    explicit Reference(TType* data) noexcept
+      : m_mutableData(data)
+    { }
 
-  void ConsoleLogger::printInfo(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->info(log);
-  #endif
-  }
+    constexpr
+    bool operator==(const Reference& other) const noexcept {
+      return m_mutableData == other.m_mutableData;
+    }
 
-  void ConsoleLogger::printWarning(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->warn(log);
-  #endif
-  }
+    constexpr
+    bool operator!=(const Reference& other) const noexcept {
+      return !operator==(other);
+    }
 
-  void ConsoleLogger::printError(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->error(log);
-  #endif
-  }
+    constexpr
+    bool operator<(const Reference& other) const noexcept {
+      return m_mutableData < other.m_mutableData;
+    }
 
-  void ConsoleLogger::printCritical(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->critical(log);
-  #endif
-  }
+    constexpr
+    TType& operator*() noexcept {
+      return *m_mutableData;
+    }
 
-  void ConsoleLogger::setSeverity(spdlog::level::level_enum level) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->set_level(level);
-  #endif
-  }
+    constexpr
+    TType* operator->() noexcept {
+      return m_mutableData;
+    }
 
-  auto ConsoleLogger::getLoggerInstance() noexcept
-    -> std::shared_ptr<spdlog::logger>&
-  {
-    return m_logger;
-  }
+    constexpr
+    TType* get() noexcept {
+      return m_mutableData;
+    }
+
+  private:
+    TType* m_mutableData;
+  };
 
 }
+
+#endif /* __INC_HEARTH_MEMORY_REFERENCE_HPP__ */

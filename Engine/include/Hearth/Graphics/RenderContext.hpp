@@ -1,7 +1,3 @@
-//
-// Created by root on 11/2/2020.
-//
-
 /* Copyright (c) 2020 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
@@ -36,10 +32,6 @@
 
 namespace Hearth {
 
-  // Foward.
-  class Application;
-  struct Window;
-
   /**
    * \brief   Describes the different types of graphics API's available.
    * \details ...
@@ -70,7 +62,7 @@ namespace Hearth {
        * \details Application's can have multiple render contexts. But the contexts are not owned by
        *          the Application. They are owned by the renderer they come from.
        */
-      const Application* app;
+      const Core::Application* app;
 
       /**
        * \brief   The requested graphics API to be used by the render context.
@@ -109,7 +101,7 @@ namespace Hearth {
      * \param[in] wnd The window to create a surface from.
      * \returns   The created surface if successful or nullptr if failed.
      */
-    virtual Surface* createSurface(const Window* wnd) noexcept = 0;
+    virtual Surface* createSurface(const Core::Window* wnd) noexcept = 0;
 
     /**
      * \brief     Destroys a provided surface.

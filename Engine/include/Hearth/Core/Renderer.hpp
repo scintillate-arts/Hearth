@@ -24,66 +24,28 @@
  * \brief
  * \details
  */
-#include <Hearth/Core/Logger.hpp>
-#include <spdlog/sinks/stdout_sinks.h>
+#ifndef __INC_HEARTH_CORE_RENDERER_HPP__
+#define __INC_HEARTH_CORE_RENDERER_HPP__ 1
+#include <memory>
 
-namespace Hearth::Core {
+namespace Hearth {
 
-  void ConsoleLogger::initialize() {
-  #if HEARTH_DEBUG
-    spdlog::set_pattern("%^[%T] %n: %v%$");
-    m_logger = spdlog::stdout_color_mt("HearthEngine");
-    m_logger->set_level(spdlog::level::trace);
-    m_logger->info("Console Logger Initialized");
-  #endif
-  }
-
-  void ConsoleLogger::printTrace(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->trace(log);
-  #endif
-  }
-
-  void ConsoleLogger::printDebug(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->debug(log);
-  #endif
-  }
-
-  void ConsoleLogger::printInfo(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->info(log);
-  #endif
-  }
-
-  void ConsoleLogger::printWarning(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->warn(log);
-  #endif
-  }
-
-  void ConsoleLogger::printError(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->error(log);
-  #endif
-  }
-
-  void ConsoleLogger::printCritical(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->critical(log);
-  #endif
-  }
-
-  void ConsoleLogger::setSeverity(spdlog::level::level_enum level) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->set_level(level);
-  #endif
-  }
-
-  auto ConsoleLogger::getLoggerInstance() noexcept
-    -> std::shared_ptr<spdlog::logger>&
-  {
-    return m_logger;
-  }
+  /**
+   * \brief   Describes an object which manages and performs the necessary actions to render graphics to the currently
+   *          set render surface, with the currently set render context.
+   * \details
+   */
+  class Renderer final {
+  public:
+    /**
+     * \brief   Retrieves the \c Renderer singleton.
+     * \details The \c Renderer is a singleton object, because it's a system which manages the rendering of an
+     *          application.
+     * \returns The \c Renderer singleton.
+     */
+    static std::shared_ptr<Renderer> instance() noexcept;
+  };
 
 }
+
+#endif /* __INC_HEARTH_CORE_RENDERER_HPP__ */

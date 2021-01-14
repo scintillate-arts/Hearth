@@ -37,9 +37,9 @@ struct WGLInitializer final {
   // Makes sure WGL gets initialized properly.
   static void initialize() {
     // Create dummy window.
-    auto dummyWindow = CreateWindowEx(
+    auto dummyWindow = CreateWindowExW(
       0,
-      Hearth::Window::kClassName.data(),
+      Hearth::Core::Window::kClassName.data(),
       L"Dummy Window",
       0,
       CW_USEDEFAULT, CW_USEDEFAULT,
@@ -158,7 +158,7 @@ private:
 
 namespace Hearth {
 
-  WinAPIOpenGLSurface::WinAPIOpenGLSurface(const Window* wnd) {
+  WinAPIOpenGLSurface::WinAPIOpenGLSurface(const Core::Window* wnd) {
     // Make sure WGL was initialized.
     if (!WGLInitializer::didInitialize()) {
       WGLInitializer::initialize();
@@ -167,7 +167,7 @@ namespace Hearth {
       HEARTH_LOGGER_DEBUG("WGL was initialized as expected");
 
     // Fetch system handle.
-    auto hWnd = reinterpret_cast<HWND>(wnd->handle());
+    auto hWnd = reinterpret_cast<HWND>(wnd->systemHandle());
 
     // Set HDC.
     mDeviceContext = GetDC(hWnd);

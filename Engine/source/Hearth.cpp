@@ -19,71 +19,16 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * \file
- * \brief
- * \details
- */
-#include <Hearth/Core/Logger.hpp>
-#include <spdlog/sinks/stdout_sinks.h>
+#include <Hearth/Hearth.hpp>
 
-namespace Hearth::Core {
+namespace Hearth {
 
-  void ConsoleLogger::initialize() {
-  #if HEARTH_DEBUG
-    spdlog::set_pattern("%^[%T] %n: %v%$");
-    m_logger = spdlog::stdout_color_mt("HearthEngine");
-    m_logger->set_level(spdlog::level::trace);
-    m_logger->info("Console Logger Initialized");
-  #endif
+  void initialize() {
+
   }
 
-  void ConsoleLogger::printTrace(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->trace(log);
-  #endif
-  }
+  void terminate() noexcept {
 
-  void ConsoleLogger::printDebug(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->debug(log);
-  #endif
-  }
-
-  void ConsoleLogger::printInfo(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->info(log);
-  #endif
-  }
-
-  void ConsoleLogger::printWarning(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->warn(log);
-  #endif
-  }
-
-  void ConsoleLogger::printError(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->error(log);
-  #endif
-  }
-
-  void ConsoleLogger::printCritical(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->critical(log);
-  #endif
-  }
-
-  void ConsoleLogger::setSeverity(spdlog::level::level_enum level) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->set_level(level);
-  #endif
-  }
-
-  auto ConsoleLogger::getLoggerInstance() noexcept
-    -> std::shared_ptr<spdlog::logger>&
-  {
-    return m_logger;
   }
 
 }

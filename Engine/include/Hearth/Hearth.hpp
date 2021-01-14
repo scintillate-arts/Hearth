@@ -19,71 +19,28 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+#ifndef __INC_HEARTH_HEARTH_HPP__
+#define __INC_HEARTH_HEARTH_HPP__ 1
+#include "Config.hpp"
+#include "Core.hpp"
+
+namespace Hearth {
 /**
- * \file
- * \brief
- * \details
+ * \fn      initialize()
+ * \brief   Initializes \c HearthEngine and all its subsystems.
+ * \details This step of the process is very important to \c HearthEngine. It's responsible for initializing the
+ *          \c Environment object, the \c Monitor objects, populating allocator memory blocks along with other things.
  */
-#include <Hearth/Core/Logger.hpp>
-#include <spdlog/sinks/stdout_sinks.h>
+/**
+ * \fn      terminate()
+ * \brief   Terminate \c HearthEngine and all it's subsystems.
+ * \details This step of the process is also very important to \c HearthEngine. It's responsible for terminating the
+ *          \c Environment object, the \c Monitor objects, and releasing the allocator memory blocks along with other
+ *          things.
+ */
 
-namespace Hearth::Core {
-
-  void ConsoleLogger::initialize() {
-  #if HEARTH_DEBUG
-    spdlog::set_pattern("%^[%T] %n: %v%$");
-    m_logger = spdlog::stdout_color_mt("HearthEngine");
-    m_logger->set_level(spdlog::level::trace);
-    m_logger->info("Console Logger Initialized");
-  #endif
-  }
-
-  void ConsoleLogger::printTrace(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->trace(log);
-  #endif
-  }
-
-  void ConsoleLogger::printDebug(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->debug(log);
-  #endif
-  }
-
-  void ConsoleLogger::printInfo(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->info(log);
-  #endif
-  }
-
-  void ConsoleLogger::printWarning(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->warn(log);
-  #endif
-  }
-
-  void ConsoleLogger::printError(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->error(log);
-  #endif
-  }
-
-  void ConsoleLogger::printCritical(std::string_view log) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->critical(log);
-  #endif
-  }
-
-  void ConsoleLogger::setSeverity(spdlog::level::level_enum level) noexcept {
-  #if HEARTH_DEBUG
-    m_logger->set_level(level);
-  #endif
-  }
-
-  auto ConsoleLogger::getLoggerInstance() noexcept
-    -> std::shared_ptr<spdlog::logger>&
-  {
-    return m_logger;
-  }
-
+  void initialize();
+  void terminate() noexcept;
 }
+
+#endif /* __INC_HEARTH_HEARTH_HPP__ */

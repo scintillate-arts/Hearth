@@ -19,11 +19,6 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * \file    WinApiEnvironment.cpp
- * \brief   ...
- * \details ...
- */
 #include <iostream>
 #include <Hearth/Core/Application.hpp>
 #include <Hearth/Core/Logger.hpp>
@@ -40,24 +35,24 @@ namespace Hearth {
 
   void WinAPIEnvironment::initialize() noexcept {
     // Do not reinitialize.
-    if (mIsInitialized)
+    if (m_initialized)
       return;
 
     // Prep object for population.
-    ZeroMemory(&mWindowClass, sizeof(WNDCLASSEX));
+    ZeroMemory(&mWindowClass, sizeof(WNDCLASSEXW));
 
     // Set properties of window class.
-    mWindowClass.cbSize        = sizeof(WNDCLASSEX);
+    mWindowClass.cbSize        = sizeof(WNDCLASSEXW);
     mWindowClass.style         = CS_DBLCLKS | CS_HREDRAW | CS_OWNDC | CS_VREDRAW;
     mWindowClass.hInstance     = GetModuleHandle(nullptr);
     mWindowClass.lpfnWndProc   = &WinAPIEventHandler::wndProc;
-    mWindowClass.lpszClassName = Window::kClassName.data();
-    mWindowClass.lpszMenuName  = Window::kMenuName.data();
+    mWindowClass.lpszClassName = Core::Window::kClassName.data();
+    mWindowClass.lpszMenuName  = Core::Window::kMenuName.data();
     if (mWindowClass.hInstance == nullptr)
       std::cout << "Hmm seems fishy.\n";
 
     // Attempt to register window class.
-    if (FAILED(RegisterClassEx(&mWindowClass))) {
+    if (FAILED(RegisterClassExW(&mWindowClass))) {
       std::wstring err(errorMessage(GetLastError()));
       HEARTH_LOGGER_CRITICAL(std::string(err.begin(), err.end()));
       throwMessageBoxAssertion(err.c_str());
@@ -77,17 +72,17 @@ namespace Hearth {
     HEARTH_LOGGER_TRACE("Console control handler set successfully");
 
     // Whew we made it!
-    mIsInitialized = true;
+    m_initialized = true;
     HEARTH_LOGGER_INFO("WinAPI environment initialized");
   }
 
   void WinAPIEnvironment::terminate() noexcept {
     // Do not reterminate.
-    if (!mIsInitialized)
+    if (!m_initialized)
       return;
 
     // Unregister window class.
-    if (FAILED(UnregisterClass(mWindowClass.lpszClassName, mWindowClass.hInstance))) {
+    if (FAILED(UnregisterClassW(mWindowClass.lpszClassName, mWindowClass.hInstance))) {
       std::wstring err(errorMessage(GetLastError()));
       HEARTH_LOGGER_CRITICAL(std::string(err.begin(), err.end()));
       throwMessageBoxAssertion(err.c_str());
@@ -97,7 +92,7 @@ namespace Hearth {
     HEARTH_LOGGER_TRACE("Window class unregistered successfully");
 
     // Good to go!
-    mIsInitialized = false;
+    m_initialized = false;
     HEARTH_LOGGER_INFO("WinAPI environment terminated");
   }
 
@@ -109,13 +104,11 @@ namespace Hearth {
     }
   }
 
-  [[nodiscard]]
-  Platform WinAPIEnvironment::platform() const noexcept {
-    return Platform::Windows;
+  Core::Platform WinAPIEnvironment::platform() const noexcept {
+    return Core::Platform::Windows;
   }
 
-  [[nodiscard]]
-  const WNDCLASSEX& WinAPIEnvironment::windowClass() const noexcept {
+  const WNDCLASSEXW& WinAPIEnvironment::windowClass() const noexcept {
     return mWindowClass;
   }
 
@@ -124,7 +117,7 @@ namespace Hearth {
     if (dwCtrlType == CTRL_C_EVENT) {
       // Get the running environment.
       HEARTH_LOGGER_WARN("Received external shutdown request from user");
-      auto env = Environment::instance();
+      auto env = Environment::instanceRef();
       for (auto app : env->trackedApps())
         app->quit(true);
       return TRUE;
@@ -186,9 +179,13 @@ namespace Hearth {
     return IsWindows10OrLater(16299);
   }
 
-  std::shared_ptr<Environment> Environment::instance() noexcept {
-    static std::shared_ptr<Environment> spSingleton = std::make_shared<WinAPIEnvironment>();
-    return spSingleton;
+  Core::EnvironmentView Core::Environment::instanceView() noexcept {
+    return EnvironmentView{ instanceRef().get() };
+  }
+
+  Core::EnvironmentRef Core::Environment::instanceRef() noexcept {
+    static std::unique_ptr<Core::Environment> spSingleton = std::make_unique<WinAPIEnvironment>();
+    return EnvironmentRef{ spSingleton.get() };
   }
 
 }

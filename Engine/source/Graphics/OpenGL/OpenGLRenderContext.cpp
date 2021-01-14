@@ -39,7 +39,7 @@ namespace Hearth {
   OpenGLRenderContext::~OpenGLRenderContext() noexcept {
   }
 
-  Surface* OpenGLRenderContext::createSurface(const Window *wnd) noexcept {
+  Surface* OpenGLRenderContext::createSurface(const Core::Window *wnd) noexcept {
     Surface* result;
     try {
     #if HEARTH_WINDOWS_PLATFORM
