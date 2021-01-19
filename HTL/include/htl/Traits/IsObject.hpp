@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,13 +19,24 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_CORE_HPP__
-#define __INC_HEARTH_CORE_HPP__ 1
-#include "Core/Application.hpp"
-#include "Core/Environment.hpp"
-#include "Core/Event.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Monitor.hpp"
-#include "Core/Version.hpp"
-#include "Core/Window.hpp"
-#endif /* __INC_HEARTH_CORE_HPP__ */
+#pragma once
+#include "Disjunction.hpp"
+#include "IsFunction.hpp"
+#include "IsReference.hpp"
+#include "IsVoid.hpp"
+#include "Negation.hpp"
+
+namespace htl {
+
+  template<typename TType>
+  struct IsObject
+    : Negation<Disjunction<IsFunction<TType>,
+                           IsReference<TType>,
+                           IsVoid<TType>
+                          >>::Type
+  { };
+
+  template<typename TType>
+  inline constexpr bool IsObject_V = IsObject<TType>::value;
+
+}

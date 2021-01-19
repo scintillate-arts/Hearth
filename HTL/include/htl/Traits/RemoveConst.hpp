@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,62 +19,19 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_MEMORY_REFERENCE_HPP__
-#define __INC_HEARTH_MEMORY_REFERENCE_HPP__ 1
+#pragma once
 
-namespace Hearth::Memory {
+namespace htl {
 
   template<typename TType>
-  class Reference final {
-    public:
-    constexpr Reference() noexcept
-      : m_mutableData(nullptr)
-    { }
+  struct RemoveConst
+  { using Type = TType; };
 
-    constexpr
-    explicit Reference(TType& data) noexcept
-      : m_mutableData(&data)
-    { }
+  template<typename TType>
+  struct RemoveConst<const TType>
+  { using Type = TType; };
 
-    constexpr
-    explicit Reference(TType* data) noexcept
-      : m_mutableData(data)
-    { }
-
-    constexpr
-    bool operator==(const Reference& other) const noexcept {
-      return m_mutableData == other.m_mutableData;
-    }
-
-    constexpr
-    bool operator!=(const Reference& other) const noexcept {
-      return !operator==(other);
-    }
-
-    constexpr
-    bool operator<(const Reference& other) const noexcept {
-      return m_mutableData < other.m_mutableData;
-    }
-
-    constexpr
-    TType& operator*() noexcept {
-      return *m_mutableData;
-    }
-
-    constexpr
-    TType* operator->() noexcept {
-      return m_mutableData;
-    }
-
-    constexpr
-    TType* get() noexcept {
-      return m_mutableData;
-    }
-
-  private:
-    TType* m_mutableData;
-  };
+  template<typename TType>
+  using RemoveConst_T = typename RemoveConst<TType>::Type;
 
 }
-
-#endif /* __INC_HEARTH_MEMORY_REFERENCE_HPP__ */

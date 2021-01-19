@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,13 +19,36 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_CORE_HPP__
-#define __INC_HEARTH_CORE_HPP__ 1
-#include "Core/Application.hpp"
-#include "Core/Environment.hpp"
-#include "Core/Event.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Monitor.hpp"
-#include "Core/Version.hpp"
-#include "Core/Window.hpp"
-#endif /* __INC_HEARTH_CORE_HPP__ */
+#pragma once
+#include "BooleanType.hpp"
+#include "Disjunction.hpp"
+
+namespace htl {
+
+  template<typename>
+  struct IsLValueReference : FalseType { };
+
+  template<typename TType>
+  struct IsLValueReference<TType&> : TrueType { };
+
+  template<typename>
+  struct IsRValueReference : FalseType { };
+
+  template<typename TType>
+  struct IsRValueReference<TType&&> : TrueType { };
+
+  template<typename TType>
+  struct IsReference
+    : Disjunction<IsLValueReference<TType>, IsRValueReference<TType>>::Type
+  { };
+
+  template<typename TType>
+  inline constexpr bool IsLValueReference_V = IsLValueReference<TType>::value;
+
+  template<typename TType>
+  inline constexpr bool IsRValueReference_V = IsRValueReference<TType>::value;
+
+  template<typename TType>
+  inline constexpr bool IsReference_V = IsReference<TType>::value;
+
+}

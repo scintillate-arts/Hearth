@@ -36,6 +36,7 @@ target_link_libraries(
   HearthLibs
   INTERFACE hearth_project_settings
   INTERFACE glm::glm
+  INTERFACE htl::htl
   INTERFACE spdlog
 )
 

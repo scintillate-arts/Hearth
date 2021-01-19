@@ -28,6 +28,7 @@
 #define __HEARTH_GFX_RENDER_CONTEXT_HPP__ 1
 #include <memory>
 #include "../Config.hpp"
+#include "../Core/Forward.hpp"
 #include "Surface.hpp"
 
 namespace Hearth {

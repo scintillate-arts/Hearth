@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,13 +19,27 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_CORE_HPP__
-#define __INC_HEARTH_CORE_HPP__ 1
-#include "Core/Application.hpp"
-#include "Core/Environment.hpp"
-#include "Core/Event.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Monitor.hpp"
-#include "Core/Version.hpp"
-#include "Core/Window.hpp"
-#endif /* __INC_HEARTH_CORE_HPP__ */
+/**
+ * \file
+ * \brief
+ */
+/**
+ * \class  htl::Reference
+ * \brief  Represents a reference to a given type.
+ * \tparam TType The type of the object to reference.
+ */
+/**
+ * \class  htl::View
+ * \brief  Represents a constant reference to a given type.
+ * \tparam TType The type of the object to reference.
+ */
+#pragma once
+
+namespace htl {
+
+  template<typename TType> struct ReferenceTraits;
+  template<typename TType> struct ViewTraits;
+  template<typename TType> class Reference;
+  template<typename TType> class View;
+
+}

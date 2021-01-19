@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,13 +19,34 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_CORE_HPP__
-#define __INC_HEARTH_CORE_HPP__ 1
-#include "Core/Application.hpp"
-#include "Core/Environment.hpp"
-#include "Core/Event.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Monitor.hpp"
-#include "Core/Version.hpp"
-#include "Core/Window.hpp"
-#endif /* __INC_HEARTH_CORE_HPP__ */
+#pragma once
+#include "BooleanType.hpp"
+#include "Conditional.hpp"
+
+namespace htl {
+
+  template<typename...>
+  struct Disjunction;
+
+  template<>
+  struct Disjunction<> : FalseType
+  { };
+
+  template<typename TBool1>
+  struct Disjunction<TBool1> : TBool1
+  { };
+
+  template<typename TBool1, typename TBool2>
+  struct Disjunction<TBool1, TBool2>
+    : Conditional<TBool1::value, TBool1, TBool2>::Type
+  { };
+
+  template<typename TBool1, typename TBool2, typename TBool3, typename... TBoolN>
+  struct Disjunction<TBool1, TBool2, TBool3, TBoolN...>
+    : public Conditional<TBool1::value, TBool1, Disjunction<TBool2, TBool3, TBoolN...>>::Type
+  { };
+
+  template<typename... TBooleans>
+  inline constexpr bool Disjunction_V = Disjunction<TBooleans...>::value;
+
+}

@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,13 +19,36 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_CORE_HPP__
-#define __INC_HEARTH_CORE_HPP__ 1
-#include "Core/Application.hpp"
-#include "Core/Environment.hpp"
-#include "Core/Event.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Monitor.hpp"
-#include "Core/Version.hpp"
-#include "Core/Window.hpp"
-#endif /* __INC_HEARTH_CORE_HPP__ */
+#pragma once
+#include "Traits/AddConst.hpp"
+#include "Traits/AddConstVolatile.hpp"
+#include "Traits/AddPointer.hpp"
+#include "Traits/AddReference.hpp"
+#include "Traits/AddVolatile.hpp"
+#include "Traits/BooleanType.hpp"
+#include "Traits/Conditional.hpp"
+#include "Traits/Conjunction.hpp"
+#include "Traits/Decay.hpp"
+#include "Traits/Disjunction.hpp"
+#include "Traits/EnableIf.hpp"
+#include "Traits/Identity.hpp"
+#include "Traits/IsArray.hpp"
+#include "Traits/IsConst.hpp"
+#include "Traits/IsFunction.hpp"
+#include "Traits/IsMemberFunctionPointer.hpp"
+#include "Traits/IsMemberPointer.hpp"
+#include "Traits/IsObject.hpp"
+#include "Traits/IsPointer.hpp"
+#include "Traits/IsReference.hpp"
+#include "Traits/IsReferenceable.hpp"
+#include "Traits/IsSame.hpp"
+#include "Traits/IsVoid.hpp"
+#include "Traits/IsVolatile.hpp"
+#include "Traits/Negation.hpp"
+#include "Traits/RemoveConst.hpp"
+#include "Traits/RemoveConstVolatile.hpp"
+#include "Traits/RemoveExtent.hpp"
+#include "Traits/RemovePointer.hpp"
+#include "Traits/RemoveReference.hpp"
+#include "Traits/RemoveVolatile.hpp"
+#include "Traits/VoidType.hpp"

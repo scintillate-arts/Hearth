@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,13 +19,31 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_CORE_HPP__
-#define __INC_HEARTH_CORE_HPP__ 1
-#include "Core/Application.hpp"
-#include "Core/Environment.hpp"
-#include "Core/Event.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Monitor.hpp"
-#include "Core/Version.hpp"
-#include "Core/Window.hpp"
-#endif /* __INC_HEARTH_CORE_HPP__ */
+#pragma once
+#include "Negation.hpp"
+#include "IsFunction.hpp"
+#include "RemoveConstVolatile.hpp"
+
+namespace htl::detail {
+
+  template<typename TType>
+  struct IsMemberPointerHelper : FalseType { };
+
+  template<typename TType, typename TClassType>
+  struct IsMemberPointerHelper<TType TClassType::*>
+    : Negation<IsFunction<TType>>::Type
+  { };
+
+}
+
+namespace htl {
+
+  template<typename TType>
+  struct IsMemberPointer
+    : detail::IsMemberPointerHelper<RemoveConstVolatile_T<TType>>::Type
+  { };
+
+  template<typename TType>
+  inline constexpr bool IsMemberPointer_V = IsMemberPointer<TType>::value;
+
+}

@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,13 +19,45 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_CORE_HPP__
-#define __INC_HEARTH_CORE_HPP__ 1
-#include "Core/Application.hpp"
-#include "Core/Environment.hpp"
-#include "Core/Event.hpp"
-#include "Core/Logger.hpp"
-#include "Core/Monitor.hpp"
-#include "Core/Version.hpp"
-#include "Core/Window.hpp"
-#endif /* __INC_HEARTH_CORE_HPP__ */
+#pragma once
+#include "IsReferenceable.hpp"
+
+namespace htl::detail {
+
+  template<typename TType, bool = IsReferenceable_V<TType>>
+  struct AddLValueReferenceHelper
+  { using Type = TType; };
+
+  template<typename TType>
+  struct AddLValueReferenceHelper<TType, true>
+  { using Type = TType&; };
+
+  template<typename TType, bool = IsReferenceable_V<TType>>
+  struct AddRValueReferenceHelper
+  { using Type = TType; };
+
+  template<typename TType>
+  struct AddRValueReferenceHelper<TType, true>
+  { using Type = TType&&; };
+
+}
+
+namespace htl {
+
+  template<typename TType>
+  struct AddLValueReference
+    : detail::AddLValueReferenceHelper<TType>
+  { };
+
+  template<typename TType>
+  struct AddRValueReference
+    : detail::AddRValueReferenceHelper<TType>
+  { };
+
+  template<typename TType>
+  using AddLValueReference_T = typename AddLValueReference<TType>::Type;
+
+  template<typename TType>
+  using AddRValueReference_T = typename AddRValueReference<TType>::Type;
+
+}

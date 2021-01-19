@@ -28,8 +28,7 @@
  */
 #include <string>
 #include <string_view>
-#include "../Memory/Reference.hpp"
-#include "../Memory/View.hpp"
+#include <htl/Memory.hpp>
 
 namespace Hearth::Core {
 /**
@@ -161,20 +160,20 @@ namespace Hearth::Core {
 
   using String            = std::string;
   using WideString        = std::wstring;
-  using ApplicationRef    = Memory::Reference<Application>;
-  using ConsoleLoggerRef  = Memory::Reference<ConsoleLogger>;
-  using EnvironmentRef    = Memory::Reference<Environment>;
-  using EventRef          = Memory::Reference<Event>;
-  using FileLoggerRef     = Memory::Reference<FileLogger>;
-  using MonitorRef        = Memory::Reference<Monitor>;
-  using WindowRef         = Memory::Reference<Window>;
-  using ApplicationView   = Memory::View<Application>;
-  using ConsoleLoggerView = Memory::View<ConsoleLogger>;
-  using EnvironmentView   = Memory::View<Environment>;
-  using EventView         = Memory::View<Event>;
-  using FileLoggerView    = Memory::View<FileLogger>;
-  using MonitorView       = Memory::View<Monitor>;
-  using WindowView        = Memory::View<Window>;
+  using ApplicationRef    = htl::Reference<Application>;
+  using ConsoleLoggerRef  = htl::Reference<ConsoleLogger>;
+  using EnvironmentRef    = htl::Reference<Environment>;
+  using EventRef          = htl::Reference<Event>;
+  using FileLoggerRef     = htl::Reference<FileLogger>;
+  using MonitorRef        = htl::Reference<Monitor>;
+  using WindowRef         = htl::Reference<Window>;
+  using ApplicationView   = htl::View<Application>;
+  using ConsoleLoggerView = htl::View<ConsoleLogger>;
+  using EnvironmentView   = htl::View<Environment>;
+  using EventView         = htl::View<Event>;
+  using FileLoggerView    = htl::View<FileLogger>;
+  using MonitorView       = htl::View<Monitor>;
+  using WindowView        = htl::View<Window>;
   using StringView        = std::string_view;
   using WideStringView    = std::wstring_view;
 

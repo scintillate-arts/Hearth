@@ -44,6 +44,18 @@ set(SPDLOG_MASTER_PROJECT OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(gtest gbench spdlog)
 message(STATUS "Googletest, Googlebenchmark, and SPDLog made available")
 
+# Provide test and benchmark build functions.
+function(add_custom_gtest TESTNAME TESTFILE)
+  add_executable(${TESTNAME} ${TESTFILE})
+  target_link_libraries(${TESTNAME} gtest_main)
+  add_test(NAME "${TESTNAME}_custom_gtest" COMMAND ${TESTNAME})
+endfunction()
+function(add_custom_gbench BENCHNAME BENCHFILE)
+add_executable(${BENCHNAME} ${BENCHFILE})
+target_link_libraries(${BENCHNAME} gtest_main)
+add_test(NAME "${BENCHNAME}_custom_gtest" COMMAND ${BENCHNAME})
+endfunction()
+
 # Needed files for building.
 include(CMake/ProjectSettings.cmake)
 include(CMake/CompilerWarnings.cmake)
@@ -58,5 +70,6 @@ option(HEARTH_BUILD_TESTS "Builds the tests for the library and editor." ON)
 option(HEARTH_BUILD_BENCHMARKS "Builds the benchmarks for the library and editor." ON)
 
 # Engine and Editor projects.
+add_subdirectory(HTL)
 add_subdirectory(Engine)
 add_subdirectory(Editor)

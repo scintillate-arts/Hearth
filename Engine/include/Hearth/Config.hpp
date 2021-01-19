@@ -461,9 +461,9 @@
 #endif
 
 // Don't allow a compiler that doesn't support C++14 or earlier.
-// #if !defined(HEARTH_CPP17_ENABLED)
-// #  error "We request that you kindly at least use a compile which supports, and has enabled, C++17."
-// #endif
+#if !defined(HEARTH_CPP17_ENABLED)
+#  error "We request that you kindly at least use a compile which supports, and has enabled, C++17."
+#endif
 
 // Detect different compilers.
 #if defined(__ARMCC_VERSION)

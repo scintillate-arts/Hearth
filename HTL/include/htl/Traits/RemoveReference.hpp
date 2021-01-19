@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 Simular Games, LLC.
+/* Copyright (c) 2020-2021 Simular Games, LLC.
  * -------------------------------------------------------------------------------------------------
  *
  * MIT License
@@ -19,62 +19,24 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __INC_HEARTH_MEMORY_VIEW_HPP__
-#define __INC_HEARTH_MEMORY_VIEW_HPP__ 1
+#pragma once
+#include "RemoveConstVolatile.hpp"
 
-namespace Hearth::Memory {
+namespace htl {
 
   template<typename TType>
-  class View final {
-  public:
-    constexpr View() noexcept
-      : m_immutableData(nullptr)
-    { }
+  struct RemoveReference
+  { using Type = TType; };
 
-    constexpr
-    explicit View(const TType& data) noexcept
-      : m_immutableData(&data)
-    { }
+  template<typename TType>
+  struct RemoveReference<TType&>
+  { using Type = TType; };
 
-    constexpr
-    explicit View(const TType* data) noexcept
-      : m_immutableData(data)
-    { }
+  template<typename TType>
+  struct RemoveReference<TType&&>
+  { using Type = TType; };
 
-    constexpr
-    bool operator==(const View& other) const noexcept {
-      return m_immutableData == other.m_immutableData;
-    }
-
-    constexpr
-    bool operator!=(const View& other) const noexcept {
-      return !operator==(other);
-    }
-
-    constexpr
-    bool operator<(const View& other) const noexcept {
-      return m_immutableData < other.m_immutableData;
-    }
-
-    constexpr
-    const TType& operator*() const noexcept {
-      return *m_immutableData;
-    }
-
-    constexpr
-    const TType* operator->() const noexcept {
-      return m_immutableData;
-    }
-
-    constexpr
-    const TType* get() const noexcept {
-      return m_immutableData;
-    }
-
-  private:
-    const TType* m_immutableData;
-  };
+  template<typename TType>
+  using RemoveReference_T = typename RemoveReference<TType>::Type;
 
 }
-
-#endif /* __INC_HEARTH_MEMORY_VIEW_HPP__ */
